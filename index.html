@@ -1,0 +1,1871 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="cafe">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Birthdays & Memories Tracker</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        /* Relaxing Cafe Palette */
+        :root[data-theme="cafe"] {
+            --bg-main: #FAF6F0;
+            --bg-card: #FFFFFF;
+            --bg-card-sub: #F3ECE1;
+            --border-color: #E6DCCE;
+            --text-main: #3D3229;
+            --text-muted: #8C7A6B;
+            --primary: #C87D55;
+            --primary-hover: #B26A43;
+            --primary-light: #F6EBE5;
+            --accent: #D4A373;
+            --hero-bg: linear-gradient(135deg, #A86B49 0%, #C87D55 50%, #D89874 100%);
+        }
+        /* Warm Vibrant Sage */
+        :root[data-theme="sage"] {
+            --bg-main: #F4F7F2;
+            --bg-card: #FFFFFF;
+            --bg-card-sub: #E3EFE0;
+            --border-color: #C2DCC0;
+            --text-main: #1C3322;
+            --text-muted: #557A59;
+            --primary: #4A7C59;
+            --primary-hover: #386043;
+            --primary-light: #E9F4E8;
+            --accent: #88B04B;
+            --hero-bg: linear-gradient(135deg, #2D5437 0%, #4A7C59 50%, #76A065 100%);
+        }
+        /* Arctic Cold Nordic Mist */
+        :root[data-theme="nordic"] {
+            --bg-main: #EBF2F7;
+            --bg-card: #FFFFFF;
+            --bg-card-sub: #D3E2EE;
+            --border-color: #B5CCE0;
+            --text-main: #0F2032;
+            --text-muted: #4B6B8A;
+            --primary: #2C5282;
+            --primary-hover: #1A365D;
+            --primary-light: #E2EBF4;
+            --accent: #63B3ED;
+            --hero-bg: linear-gradient(135deg, #1A365D 0%, #2C5282 50%, #4299E1 100%);
+        }
+        /* Cozy Sunset Palette */
+        :root[data-theme="sunset"] {
+            --bg-main: #FFF4EE;
+            --bg-card: #FFFFFF;
+            --bg-card-sub: #FDE2D4;
+            --border-color: #F7C3AD;
+            --text-main: #421D12;
+            --text-muted: #995642;
+            --primary: #E07A5F;
+            --primary-hover: #C55D42;
+            --primary-light: #FCEBE4;
+            --accent: #F4A261;
+            --hero-bg: linear-gradient(135deg, #B84324 0%, #E07A5F 50%, #F4A261 100%);
+        }
+        /* Snowy Wonderland Palette */
+        :root[data-theme="snowy"] {
+            --bg-main: #F0F8FF;
+            --bg-card: #FFFFFF;
+            --bg-card-sub: #DDF0FC;
+            --border-color: #B9E1F8;
+            --text-main: #0B2545;
+            --text-muted: #3D6B9C;
+            --primary: #0284C7;
+            --primary-hover: #0369A1;
+            --primary-light: #E0F2FE;
+            --accent: #38BDF8;
+            --hero-bg: linear-gradient(135deg, #0369A1 0%, #0284C7 50%, #38BDF8 100%);
+        }
+        /* Warm Mocha Dark Palette */
+        :root[data-theme="mocha"] {
+            --bg-main: #1A1614;
+            --bg-card: #25201C;
+            --bg-card-sub: #332B25;
+            --border-color: #443B34;
+            --text-main: #F7EEE9;
+            --text-muted: #A89C93;
+            --primary: #D4A373;
+            --primary-hover: #BC8B5C;
+            --primary-light: #352B23;
+            --accent: #E5989B;
+            --hero-bg: linear-gradient(135deg, #3A2C23 0%, #544134 50%, #785C49 100%);
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', 'Noto Sans TC', 'Noto Sans SC', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            transition: background-color 0.3s ease, color 0.3s ease;
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+        #particle-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+        .ambient-particle {
+            position: absolute;
+            user-select: none;
+            opacity: 0.7;
+            animation: floatDown linear infinite;
+        }
+        @keyframes floatDown {
+            0% {
+                transform: translateY(-10vh) rotate(0deg);
+                opacity: 0;
+            }
+            15% {
+                opacity: 0.8;
+            }
+            85% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(105vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        .theme-card {
+            background-color: var(--bg-card);
+            border-color: var(--border-color);
+        }
+        .theme-subcard {
+            background-color: var(--bg-card-sub);
+        }
+        .theme-primary-btn {
+            background-color: var(--primary);
+            color: #FFFFFF;
+        }
+        .theme-primary-btn:hover {
+            background-color: var(--primary-hover);
+        }
+        .theme-hero {
+            background: var(--hero-bg);
+        }
+        .theme-text-muted {
+            color: var(--text-muted);
+        }
+        .theme-border {
+            border-color: var(--border-color);
+        }
+        /* Custom Scrollbars */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-main);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 9999px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Ambient Particle Canvas Container -->
+    <div id="particle-container"></div>
+    <!-- Notification Toast Container -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+
+    <!-- Navigation Header -->
+    <header class="sticky top-0 z-30 theme-card backdrop-blur-md border-b shadow-sm transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- App Logo -->
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('dashboard')">
+                    <div class="w-10 h-10 rounded-xl theme-hero flex items-center justify-center text-white shadow-sm">
+                        <i class="fa-solid fa-cake-candles text-lg"></i>
+                    </div>
+                    <div>
+                        <span class="text-xl font-extrabold tracking-tight" style="color: var(--text-main);">BdayPulse</span>
+                        <span class="block text-[10px] font-semibold tracking-widest uppercase theme-text-muted" data-i18n="tagline">Reminder & Memories</span>
+                    </div>
+                </div>
+
+                <!-- Main Desktop Navigation -->
+                <nav class="hidden md:flex space-x-1 theme-subcard p-1.5 rounded-xl border theme-border">
+                    <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200">
+                        <i class="fa-solid fa-compass mr-2"></i><span data-i18n="nav_dashboard">Dashboard</span>
+                    </button>
+                    <button onclick="switchTab('birthdays')" id="nav-birthdays" class="nav-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200">
+                        <i class="fa-solid fa-calendar-days mr-2"></i><span data-i18n="nav_birthdays">All Birthdays</span>
+                    </button>
+                    <button onclick="switchTab('categories')" id="nav-categories" class="nav-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200">
+                        <i class="fa-solid fa-tags mr-2"></i><span data-i18n="nav_categories">Categories</span>
+                    </button>
+                    <button onclick="switchTab('activity')" id="nav-activity" class="nav-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200">
+                        <i class="fa-solid fa-clock-rotate-left mr-2"></i><span data-i18n="nav_activity">Memories & Logs</span>
+                    </button>
+                </nav>
+
+                <!-- Header Controls: Sign In Button, Theme Select, Language Select & Add Birthday -->
+                <div class="flex items-center space-x-2 sm:space-x-3">
+                    <!-- Sign In / User Account Button -->
+                    <button onclick="openAuthModal()" id="auth-status-btn" class="flex items-center space-x-2 px-3 py-2 text-xs font-bold rounded-xl theme-subcard border theme-border hover:opacity-90 transition">
+                        <span id="auth-status-dot" class="w-2 h-2 rounded-full bg-amber-500"></span>
+                        <i class="fa-solid fa-user-circle text-sm"></i>
+                        <span id="auth-status-text" data-i18n="btn_sign_in">Sign In</span>
+                    </button>
+
+                    <!-- Appearance Theme Selector -->
+                    <div class="relative">
+                        <select id="theme-select" onchange="changeTheme(this.value)" class="text-xs font-semibold px-2.5 py-2 rounded-xl theme-subcard border theme-border focus:outline-none cursor-pointer">
+                            <option value="cafe">☕ Relaxing Cafe</option>
+                            <option value="sage">🌿 Warm Sage</option>
+                            <option value="nordic">❄️ Nordic Mist</option>
+                            <option value="sunset">🌅 Cozy Sunset</option>
+                            <option value="snowy">☃️ Snowy Wonderland</option>
+                            <option value="mocha">🌙 Warm Mocha</option>
+                        </select>
+                    </div>
+
+                    <!-- Language Selector Dropdown -->
+                    <div class="relative">
+                        <select id="lang-select" onchange="changeLanguage(this.value)" class="text-xs font-bold px-2.5 py-2 rounded-xl theme-subcard border theme-border focus:outline-none cursor-pointer">
+                            <option value="en">🌐 English</option>
+                            <option value="zh-TW">🌐 繁體中文</option>
+                            <option value="zh-CN">🌐 简体中文</option>
+                        </select>
+                    </div>
+
+                    <!-- Add Birthday Button -->
+                    <button onclick="openAddModal()" class="inline-flex items-center px-3.5 py-2 theme-primary-btn font-semibold text-sm rounded-xl shadow-sm transition transform active:scale-95">
+                        <i class="fa-solid fa-plus mr-1.5"></i> <span data-i18n="add_btn">Add Birthday</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Nav Bar -->
+    <div class="md:hidden theme-card border-b theme-border px-2 py-2 flex justify-around text-xs font-semibold z-20">
+        <button onclick="switchTab('dashboard')" id="mobile-nav-dashboard" class="mobile-nav-btn py-1 px-3 rounded-lg">
+            <i class="fa-solid fa-compass block text-base mx-auto mb-0.5"></i><span data-i18n="nav_dashboard">Home</span>
+        </button>
+        <button onclick="switchTab('birthdays')" id="mobile-nav-birthdays" class="mobile-nav-btn py-1 px-3 rounded-lg">
+            <i class="fa-solid fa-calendar-days block text-base mx-auto mb-0.5"></i><span data-i18n="nav_birthdays">List</span>
+        </button>
+        <button onclick="switchTab('categories')" id="mobile-nav-categories" class="mobile-nav-btn py-1 px-3 rounded-lg">
+            <i class="fa-solid fa-tags block text-base mx-auto mb-0.5"></i><span data-i18n="nav_categories">Labels</span>
+        </button>
+        <button onclick="switchTab('activity')" id="mobile-nav-activity" class="mobile-nav-btn py-1 px-3 rounded-lg">
+            <i class="fa-solid fa-clock-rotate-left block text-base mx-auto mb-0.5"></i><span data-i18n="nav_activity">Logs</span>
+        </button>
+        <button onclick="openAuthModal()" class="mobile-nav-btn py-1 px-3 rounded-lg">
+            <i class="fa-solid fa-user-circle block text-base mx-auto mb-0.5"></i><span data-i18n="nav_auth">Account</span>
+        </button>
+    </div>
+
+    <!-- Main Content Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-12 flex-1 w-full">
+        <!-- DASHBOARD TAB -->
+        <div id="tab-dashboard" class="tab-content space-y-8">
+            <!-- Next Birthday Spotlight Hero -->
+            <section id="hero-countdown-container" class="relative rounded-3xl overflow-hidden shadow-md text-white p-6 sm:p-8 md:p-10 transition-all duration-300">
+                <!-- Rendered dynamically by JS -->
+            </section>
+            <!-- Quick Overview Stats -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                <div class="theme-card p-5 rounded-2xl border shadow-sm flex items-center space-x-4">
+                    <div class="w-12 h-12 rounded-xl theme-subcard flex items-center justify-center text-xl" style="color: var(--primary);">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-medium uppercase tracking-wider theme-text-muted" data-i18n="stat_total">Total Reminders</p>
+                        <h3 id="stat-total" class="text-2xl font-bold">0</h3>
+                    </div>
+                </div>
+                <div class="theme-card p-5 rounded-2xl border shadow-sm flex items-center space-x-4">
+                    <div class="w-12 h-12 rounded-xl theme-subcard flex items-center justify-center text-xl" style="color: var(--primary);">
+                        <i class="fa-solid fa-calendar-week"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-medium uppercase tracking-wider theme-text-muted" data-i18n="stat_month">This Month</p>
+                        <h3 id="stat-month" class="text-2xl font-bold">0</h3>
+                    </div>
+                </div>
+                <div class="theme-card p-5 rounded-2xl border shadow-sm flex items-center space-x-4">
+                    <div class="w-12 h-12 rounded-xl theme-subcard flex items-center justify-center text-xl" style="color: var(--primary);">
+                        <i class="fa-solid fa-box-archive"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-medium uppercase tracking-wider theme-text-muted" data-i18n="stat_logs">Actions Saved</p>
+                        <h3 id="stat-logs" class="text-2xl font-bold">0</h3>
+                    </div>
+                </div>
+            </div>
+            <!-- Dashboard Grid Layout -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Upcoming Birthday List (2 Cols) -->
+                <div class="lg:col-span-2 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-xl font-bold flex items-center">
+                            <i class="fa-solid fa-hourglass-half mr-2.5" style="color: var(--primary);"></i> <span data-i18n="upcoming_title">Upcoming Soon</span>
+                        </h2>
+                        <button onclick="switchTab('birthdays')" class="text-sm font-semibold hover:opacity-80 transition" style="color: var(--primary);" data-i18n="view_all">View All &rarr;</button>
+                    </div>
+                    <div id="upcoming-list" class="space-y-3">
+                        <!-- Rendered by JS -->
+                    </div>
+                </div>
+                <!-- Quick Actions / Category Teaser -->
+                <div class="space-y-6">
+                    <div class="theme-card rounded-2xl p-5 border shadow-sm space-y-4">
+                        <div class="flex items-center justify-between">
+                            <p class="text-xs font-semibold uppercase tracking-wider theme-text-muted" data-i18n="plan_ahead_title">Plan Ahead</p>
+                            <div id="sync-indicator" class="inline-flex items-center text-[11px] font-semibold text-gray-500 bg-gray-100 px-2 py-0.5 rounded-md border border-gray-200">
+                                <i class="fa-solid fa-cloud mr-1"></i> <span data-i18n="local_only">Local Storage</span>
+                            </div>
+                        </div>
+                        <p class="text-sm theme-text-muted" data-i18n="plan_ahead_desc">Keep track of cards sent, presents bought, or messages sent so you never forget what you did!</p>
+                        <button onclick="openLogModal()" class="w-full py-2.5 px-4 theme-primary-btn text-sm font-semibold rounded-xl transition shadow-sm flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                            <span data-i18n="log_memory_btn">Log an Activity / Memory</span>
+                        </button>
+                    </div>
+                    <!-- Category Breakdown -->
+                    <div class="theme-card rounded-2xl p-5 border shadow-sm space-y-3">
+                        <div class="flex items-center justify-between">
+                            <h3 class="font-bold text-sm" data-i18n="category_breakdown">Category Breakdown</h3>
+                            <button onclick="switchTab('categories')" class="text-xs font-semibold" style="color: var(--primary);" data-i18n="manage_btn">Manage</button>
+                        </div>
+                        <div id="category-summary-list" class="space-y-2">
+                            <!-- Rendered by JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BIRTHDAYS TAB -->
+        <div id="tab-birthdays" class="tab-content hidden space-y-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 theme-card p-5 rounded-2xl border shadow-sm">
+                <div>
+                    <h2 class="text-2xl font-extrabold" data-i18n="all_birthdays_title">All Birthdays</h2>
+                    <p class="text-xs theme-text-muted mt-0.5" data-i18n="all_birthdays_sub">Filter, search and manage all saved birthday reminders</p>
+                </div>
+                <div class="flex flex-wrap items-center gap-3">
+                    <div class="relative min-w-[200px] flex-1 sm:flex-initial">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 theme-text-muted text-sm"></i>
+                        <input type="text" id="search-input" oninput="renderBirthdaysList()" placeholder="Search person name..." data-i18n-ph="search_placeholder" class="w-full pl-9 pr-4 py-2 text-sm theme-subcard border theme-border rounded-xl focus:outline-none font-medium">
+                    </div>
+                    <select id="sort-select" onchange="renderBirthdaysList()" class="px-3 py-2 text-sm theme-subcard border theme-border rounded-xl focus:outline-none font-medium">
+                        <option value="days" data-i18n="sort_days">Sort by Days Left</option>
+                        <option value="name" data-i18n="sort_name">Sort by Name</option>
+                        <option value="month" data-i18n="sort_month">Sort by Month</option>
+                    </select>
+                </div>
+            </div>
+            <!-- Category Pills Filter -->
+            <div id="category-filter-pills" class="flex items-center space-x-2 overflow-x-auto pb-2">
+                <!-- Dynamic Pill Buttons -->
+            </div>
+            <!-- Grid of Birthday Cards -->
+            <div id="birthdays-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                <!-- Cards rendered by JS -->
+            </div>
+        </div>
+
+        <!-- CATEGORIES TAB -->
+        <div id="tab-categories" class="tab-content hidden space-y-6">
+            <div class="flex items-center justify-between theme-card p-5 rounded-2xl border shadow-sm">
+                <div>
+                    <h2 class="text-2xl font-extrabold" data-i18n="categories_title">Custom Category Labels</h2>
+                    <p class="text-xs theme-text-muted mt-0.5" data-i18n="categories_sub">Organize your birthdays by customized groups (Family, Friends, Work, VIP, etc.)</p>
+                </div>
+                <button onclick="openAddCategoryModal()" class="px-4 py-2 theme-primary-btn font-semibold text-sm rounded-xl shadow-sm transition">
+                    <i class="fa-solid fa-plus mr-1.5"></i> <span data-i18n="new_category">New Category</span>
+                </button>
+            </div>
+            <div id="categories-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <!-- Categories rendered by JS -->
+            </div>
+        </div>
+
+        <!-- ACTIVITY / MEMORIES TAB -->
+        <div id="tab-activity" class="tab-content hidden space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 theme-card p-5 rounded-2xl border shadow-sm">
+                <div>
+                    <h2 class="text-2xl font-extrabold" data-i18n="activity_title">Activity & Memories Log</h2>
+                    <p class="text-xs theme-text-muted mt-0.5" data-i18n="activity_sub">Record gifts given, messages sent, party notes, and past celebration memories.</p>
+                </div>
+                <button onclick="openLogModal()" class="px-4 py-2 theme-primary-btn font-semibold text-sm rounded-xl shadow-sm transition flex items-center justify-center">
+                    <i class="fa-solid fa-plus mr-1.5"></i> <span data-i18n="log_action_btn">Log Action / Memory</span>
+                </button>
+            </div>
+            <!-- Filter Logs -->
+            <div class="flex items-center space-x-3 theme-subcard p-3 rounded-xl border theme-border">
+                <span class="text-xs font-bold uppercase px-2 theme-text-muted" data-i18n="filter_log">Filter Log:</span>
+                <select id="log-person-filter" onchange="renderActivityLogs()" class="text-xs font-semibold px-3 py-1.5 theme-card border theme-border rounded-lg focus:outline-none">
+                    <option value="all" data-i18n="all_people">All People</option>
+                </select>
+            </div>
+            <!-- Timeline of Logs -->
+            <div class="theme-card p-6 rounded-2xl border shadow-sm">
+                <div id="logs-timeline" class="relative border-l-2 pl-6 space-y-6 ml-3" style="border-color: var(--border-color);">
+                    <!-- Logs rendered by JS -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Sign In / Cloud Account Modal -->
+    <div id="modal-auth" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="theme-card rounded-3xl max-w-md w-full p-6 shadow-2xl border theme-border relative text-center space-y-5">
+            <button onclick="closeAuthModal()" class="absolute top-5 right-5 w-8 h-8 rounded-full theme-subcard theme-text-muted hover:opacity-100 flex items-center justify-center transition">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="w-14 h-14 rounded-2xl theme-hero flex items-center justify-center text-white mx-auto shadow-md text-2xl">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+            </div>
+
+            <div>
+                <h3 class="text-xl font-extrabold" data-i18n="auth_modal_title">Cloud Account & Sync</h3>
+                <p class="text-xs theme-text-muted mt-1 px-4" data-i18n="auth_desc">Sign in to save your birthdays, custom categories, and celebration logs safely to the cloud so you can access them anywhere.</p>
+            </div>
+
+            <!-- Current Status Box -->
+            <div class="theme-subcard p-4 rounded-2xl border theme-border text-left space-y-2">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold uppercase theme-text-muted" data-i18n="auth_status_label">Current Status</span>
+                    <span id="modal-user-badge" class="px-2.5 py-1 text-[11px] font-bold rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">Checking...</span>
+                </div>
+                <p id="modal-user-id" class="text-xs font-mono font-semibold truncate theme-text-muted">Loading user profile...</p>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="space-y-3 pt-1">
+                <button id="btn-signin" onclick="performSignInGuest()" class="w-full py-3 theme-primary-btn font-semibold text-sm rounded-xl transition shadow-sm flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-right-to-bracket"></i>
+                    <span data-i18n="btn_sign_in_guest">Sign In & Connect Cloud Sync</span>
+                </button>
+
+                <button onclick="manualCloudSync()" class="w-full py-2.5 theme-subcard font-semibold text-xs rounded-xl transition border theme-border flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-arrows-rotate"></i>
+                    <span data-i18n="btn_sync_now">Sync Cloud Progress Now</span>
+                </button>
+
+                <button id="btn-signout" onclick="performSignOut()" class="w-full py-2.5 bg-rose-500/10 text-rose-600 font-semibold text-xs rounded-xl border border-rose-500/20 hover:bg-rose-500/20 transition hidden">
+                    <i class="fa-solid fa-arrow-right-from-bracket mr-1"></i> <span data-i18n="btn_sign_out">Sign Out</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Birthday Modal -->
+    <div id="modal-birthday" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="theme-card rounded-3xl max-w-lg w-full p-6 shadow-2xl border theme-border relative my-8">
+            <button onclick="closeAddModal()" class="absolute top-5 right-5 w-8 h-8 rounded-full theme-subcard theme-text-muted hover:opacity-100 flex items-center justify-center transition">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h3 id="modal-bday-title" class="text-xl font-extrabold mb-4" data-i18n="add_birthday_modal_title">Add New Birthday</h3>
+            <form id="form-birthday" onsubmit="handleBirthdaySubmit(event)" class="space-y-4">
+                <input type="hidden" id="bday-id">
+                <div>
+                    <label class="block text-xs font-bold uppercase theme-text-muted mb-1" data-i18n="form_person_name">Person's Full Name *</label>
+                    <input type="text" id="bday-name" required placeholder="e.g., Sarah Connor" class="w-full px-4 py-2.5 text-sm theme-subcard border theme-border rounded-xl focus:outline-none font-medium">
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold uppercase theme-text-muted mb-1" data-i18n="form_dob">Date of Birth *</label>
+                        <input type="date" id="bday-date" required class="w-full px-4 py-2.5 text-sm theme-subcard border theme-border rounded-xl focus:outline-none font-medium">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase theme-text-muted mb-1" data-i18n="form_category">Category Label *</label>
+                        <select id="bday-category" required class="w-full px-4 py-2.5 text-sm theme-subcard border theme-border rounded-xl focus:outline-none font-medium">
+                            <!-- Populated by JS -->
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase theme-text-muted mb-1" data-i18n="form_accent">Avatar Accent Palette</label>
+                    <div class="flex items-center space-x-3" id="color-picker-group">
+                        <button type="button" data-color="cafe" onclick="selectAvatarColor('cafe')" class="color-btn w-8 h-8 rounded-full bg-[#C87D55] ring-2 ring-[#C87D55] ring-offset-2 transition"></button>
+                        <button type="button" data-color="sage" onclick="selectAvatarColor('sage')" class="color-btn w-8 h-8 rounded-full bg-[#4A7C59] transition"></button>
+                        <button type="button" data-color="nordic" onclick="selectAvatarColor('nordic')" class="color-btn w-8 h-8 rounded-full bg-[#2C5282] transition"></button>
+                        <button type="button" data-color="sunset" onclick="selectAvatarColor('sunset')" class="color-btn w-8 h-8 rounded-full bg-[#E07A5F] transition"></button>
+                        <button type="button" data-color="amber" onclick="selectAvatarColor('amber')" class="color-btn w-8 h-8 rounded-full bg-[#D4A373] transition"></button>
+                    </div>
+                    <input type="hidden" id="bday-color" value="cafe">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase theme-text-muted mb-1" data-i18n="form_notes">Gift Ideas & Notes</label>
+                    <textarea id="bday-notes" rows="3" placeholder="Likes coffee, books, favorite color teal..." data-i18n-ph="notes_ph" class="w-full px-4 py-2.5 text-sm theme-subcard border theme-border rounded-xl focus:outline-none font-medium"></textarea>
+                </div>
+                <div class="pt-3 flex space-x-3">
+                    <button type="button" onclick="closeAddModal()" class="w-1/2 py-2.5 theme-subcard font-semibold text-sm rounded-xl transition" data-i18n="btn_cancel">Cancel</button>
+                    <button type="submit" class="w-1/2 py-2.5 theme-primary-btn font-semibold text-sm rounded-xl transition shadow-sm" data-i18n="btn_save_bday">Save Birthday</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Category Modal -->
+    <div id="modal-category" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="theme-card rounded-3xl max-w-md w-full p-6 shadow-2xl border theme-border relative">
+            <button onclick="closeCategoryModal()" class="absolute top-5 right-5 w-8 h-8 rounded-full theme-subcard theme-text-muted hover:opacity-100 flex items-center justify-center transition">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h3 class="text-xl font-extrabold mb-4" data-i18n="new_category_modal_title">New Category Label</h3>
+            <form id="form-category" onsubmit="handleCategorySubmit(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase theme-text-muted mb-1" data-i18n="cat_name_label">Category Name *</label>
+                    <input type="text" id="cat-name" required placeholder="e.g., University, Best Friends, Co-workers" data-i18n-ph="cat_ph" class="w-full px-4 py-2.5 text-sm theme-subcard border theme-border rounded-xl focus:outline-none font-medium">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase theme-text-muted mb-1" data-i18n="cat_color_label">Badge Color Palette</label>
+                    <select id="cat-color" class="w-full px-4 py-2.5 text-sm theme-subcard border theme-border rounded-xl focus:outline-none font-medium">
+                        <option value="cafe">☕ Cafe Caramel</option>
+                        <option value="sage">🌿 Warm Sage Green</option>
+                        <option value="nordic">❄️ Nordic Denim Blue</option>
+                        <option value="sunset">🌅 Soft Peach Sunset</option>
+                        <option value="amber">🍯 Warm Amber</option>
+                    </select>
+                </div>
+                <div class="pt-3 flex space-x-3">
+                    <button type="button" onclick="closeCategoryModal()" class="w-1/2 py-2.5 theme-subcard font-semibold text-sm rounded-xl transition" data-i18n="btn_cancel">Cancel</button>
+                    <button type="submit" class="w-1/2 py-2.5 theme-primary-btn font-semibold text-sm rounded-xl transition shadow-sm" data-i18n="btn_create_label">Create Label</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Log Activity Modal -->
+    <div id="modal-log" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="theme-card rounded-3xl max-w-lg w-full p-6 shadow-2xl border theme-border relative">
+            <button onclick="closeLogModal()" class="absolute top-5 right-5 w-8 h-8 rounded-full theme-subcard theme-text-muted hover:opacity-100 flex items-center justify-center transition">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h3 class="text-xl font-extrabold mb-1" data-i18n="log_modal_title">Log Action / Memory</h3>
+            <p class="text-xs theme-text-muted mb-4" data-i18n="log_modal_sub">Record what you did for this person on their birthday</p>
+            <form id="form-log" onsubmit="handleLogSubmit(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase theme-text-muted mb-1" data-i18n="log_select_person">Select Person *</label>
+                    <select id="log-person-select" required class="w-full px-4 py-2.5 text-sm theme-subcard border theme-border rounded-xl focus:outline-none font-medium">
+                        <!-- Populated by JS -->
+                    </select>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold uppercase theme-text-muted mb-1" data-i18n="log_type_label">Action Type *</label>
+                        <select id="log-type" required class="w-full px-4 py-2.5 text-sm theme-subcard border theme-border rounded-xl focus:outline-none font-medium">
+                            <option value="🎁 Bought Gift">🎁 Bought Gift</option>
+                            <option value="📞 Called & Wished">📞 Called & Wished</option>
+                            <option value="💬 Sent Text / Card">💬 Sent Text / Card</option>
+                            <option value="🎂 Celebrated / Party">🎂 Celebrated / Party</option>
+                            <option value="💌 Sent Flowers / Present">💌 Sent Flowers / Present</option>
+                            <option value="✍️ Planned Idea">✍️ Planned Idea</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase theme-text-muted mb-1" data-i18n="log_date_label">Date *</label>
+                        <input type="date" id="log-date" required class="w-full px-4 py-2.5 text-sm theme-subcard border theme-border rounded-xl focus:outline-none font-medium">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase theme-text-muted mb-1" data-i18n="log_notes_label">Details & Memories *</label>
+                    <textarea id="log-notes" rows="3" required placeholder="e.g., Sent gift card ($50), called in the morning, went for cozy cafe lunch!" data-i18n-ph="log_ph" class="w-full px-4 py-2.5 text-sm theme-subcard border theme-border rounded-xl focus:outline-none font-medium"></textarea>
+                </div>
+                <div class="pt-3 flex space-x-3">
+                    <button type="button" onclick="closeLogModal()" class="w-1/2 py-2.5 theme-subcard font-semibold text-sm rounded-xl transition" data-i18n="btn_cancel">Cancel</button>
+                    <button type="submit" class="w-1/2 py-2.5 theme-primary-btn font-semibold text-sm rounded-xl transition shadow-sm" data-i18n="btn_save_log">Save Log</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Custom Confirmation Modal (Replaces browser confirm) -->
+    <div id="modal-confirm" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="theme-card rounded-3xl max-w-sm w-full p-6 shadow-2xl border theme-border text-center space-y-4">
+            <div class="w-12 h-12 rounded-full bg-rose-500/10 text-rose-500 flex items-center justify-center mx-auto text-xl">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <div>
+                <h3 id="confirm-title" class="text-lg font-extrabold mb-1">Confirm Action</h3>
+                <p id="confirm-msg" class="text-xs theme-text-muted">Are you sure you want to proceed?</p>
+            </div>
+            <div class="flex space-x-3 pt-2">
+                <button onclick="closeConfirmModal(false)" class="w-1/2 py-2.5 theme-subcard font-semibold text-xs rounded-xl transition" data-i18n="btn_cancel">Cancel</button>
+                <button onclick="closeConfirmModal(true)" class="w-1/2 py-2.5 bg-rose-500 text-white font-semibold text-xs rounded-xl hover:bg-rose-600 transition shadow-sm" data-i18n="btn_delete">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // i18n Dictionary for English, Traditional Chinese (zh-TW), and Simplified Chinese (zh-CN)
+        const i18n = {
+            en: {
+                tagline: "Reminder & Memories",
+                nav_dashboard: "Dashboard",
+                nav_birthdays: "All Birthdays",
+                nav_categories: "Categories",
+                nav_activity: "Memories & Logs",
+                nav_auth: "Account",
+                add_btn: "Add Birthday",
+                stat_total: "Total Reminders",
+                stat_month: "This Month",
+                stat_logs: "Actions Saved",
+                upcoming_title: "Upcoming Soon",
+                view_all: "View All →",
+                plan_ahead_title: "Plan Ahead",
+                plan_ahead_desc: "Keep track of cards sent, presents bought, or messages sent so you never forget what you did!",
+                log_memory_btn: "Log an Activity / Memory",
+                category_breakdown: "Category Breakdown",
+                manage_btn: "Manage",
+                all_birthdays_title: "All Birthdays",
+                all_birthdays_sub: "Filter, search and manage all saved birthday reminders",
+                search_placeholder: "Search person name...",
+                sort_days: "Sort by Days Left",
+                sort_name: "Sort by Name",
+                sort_month: "Sort by Month",
+                categories_title: "Custom Category Labels",
+                categories_sub: "Organize your birthdays by customized groups (Family, Friends, Work, VIP, etc.)",
+                new_category: "New Category",
+                activity_title: "Activity & Memories Log",
+                activity_sub: "Record gifts given, messages sent, party notes, and past celebration memories.",
+                log_action_btn: "Log Action / Memory",
+                filter_log: "Filter Log:",
+                all_people: "All People",
+                add_birthday_modal_title: "Add New Birthday",
+                form_person_name: "Person's Full Name *",
+                form_dob: "Date of Birth *",
+                form_category: "Category Label *",
+                form_accent: "Avatar Accent Palette",
+                form_notes: "Gift Ideas & Notes",
+                notes_ph: "Likes coffee, books, favorite color teal...",
+                btn_cancel: "Cancel",
+                btn_save_bday: "Save Birthday",
+                new_category_modal_title: "New Category Label",
+                cat_name_label: "Category Name *",
+                cat_ph: "e.g., University, Best Friends, Co-workers",
+                cat_color_label: "Badge Color Palette",
+                btn_create_label: "Create Label",
+                log_modal_title: "Log Action / Memory",
+                log_modal_sub: "Record what you did for this person on their birthday",
+                log_select_person: "Select Person *",
+                log_type_label: "Action Type *",
+                log_date_label: "Date *",
+                log_notes_label: "Details & Memories *",
+                log_ph: "e.g., Sent gift card ($50), called in the morning, went for cozy cafe lunch!",
+                btn_save_log: "Save Log",
+                btn_delete: "Delete",
+                turning: "Turning",
+                years_old: "years old",
+                spotlight: "Next Birthday Spotlight",
+                time_remaining: "Time Remaining",
+                days: "Days",
+                hours: "Hours",
+                mins: "Mins",
+                secs: "Secs",
+                log_celebration: "Log Celebration",
+                no_bdays_title: "No Birthdays Added Yet",
+                no_bdays_desc: "Start by adding your loved ones' birthdays or creating custom category labels!",
+                add_first_bday: "Add First Birthday",
+                no_cats_title: "No Custom Categories Yet",
+                no_cats_desc: "Create category labels (e.g. Family, Friends, Work) to organize your birthday reminders.",
+                create_first_cat: "Create First Category",
+                today: "🎉 TODAY!",
+                in_days: "days away",
+                confirm_delete_bday: "Delete Birthday Reminder",
+                confirm_delete_bday_msg: "Are you sure you want to delete this birthday entry?",
+                confirm_delete_cat: "Delete Category Label",
+                confirm_delete_cat_msg: "Are you sure? Birthdays under this category will be reassigned.",
+                confirm_delete_log: "Delete Memory Log",
+                confirm_delete_log_msg: "Are you sure you want to delete this activity entry?",
+                btn_sign_in: "Sign In",
+                btn_sign_out: "Sign Out",
+                auth_modal_title: "Cloud Account & Sync",
+                auth_desc: "Sign in to save your birthdays, custom categories, and celebration logs safely to the cloud so you can access them anywhere.",
+                auth_status_label: "Current Status",
+                auth_status_signed_in: "Signed In & Cloud Connected",
+                auth_status_guest: "Signed in as Guest (Cloud Saved)",
+                auth_status_offline: "Offline / Local Mode",
+                btn_sign_in_guest: "Sign In & Connect Cloud Sync",
+                btn_sync_now: "Sync Cloud Progress Now",
+                synced: "Saved to Cloud",
+                syncing: "Syncing...",
+                sync_error: "Sync Error",
+                local_only: "Local Storage",
+                auth_signed_in_toast: "Cloud account signed in & progress synced!",
+                auth_signed_out_toast: "Signed out of cloud account."
+            },
+            'zh-TW': {
+                tagline: "生日提醒與回憶日誌",
+                nav_dashboard: "主頁儀表板",
+                nav_birthdays: "所有生日",
+                nav_categories: "分類標籤",
+                nav_activity: "回憶與日誌",
+                nav_auth: "帳號同步",
+                add_btn: "新增生日",
+                stat_total: "總生日提醒",
+                stat_month: "本月生日",
+                stat_logs: "已記錄回憶",
+                upcoming_title: "即將到來",
+                view_all: "查看全部 →",
+                plan_ahead_title: "提前規劃",
+                plan_ahead_desc: "記錄已發送的賀卡、購買的禮物或祝福訊息，永遠不忘記你的心意！",
+                log_memory_btn: "記錄慶祝 / 活動回憶",
+                category_breakdown: "分類統計",
+                manage_btn: "管理標籤",
+                all_birthdays_title: "所有生日名單",
+                all_birthdays_sub: "搜尋、篩選及管理所有已儲存的生日提醒",
+                search_placeholder: "搜尋姓名或備註...",
+                sort_days: "按剩餘天數排序",
+                sort_name: "按姓名排序",
+                sort_month: "按月份排序",
+                categories_title: "自訂分類標籤",
+                categories_sub: "以自訂群組（家人、朋友、同事、VIP 等）輕鬆分類管理生日",
+                new_category: "新增標籤",
+                activity_title: "活動與回憶日誌",
+                activity_sub: "記錄送出的禮物、通話祝福、聚會筆記與珍貴慶祝回憶。",
+                log_action_btn: "新增活動紀錄",
+                filter_log: "篩選紀錄：",
+                all_people: "所有對象",
+                add_birthday_modal_title: "新增生日提醒",
+                form_person_name: "全名 / 稱呼 *",
+                form_dob: "出生日期 *",
+                form_category: "分類標籤 *",
+                form_accent: "頭像主題色系",
+                form_notes: "禮物靈感與備註",
+                notes_ph: "喜歡咖啡、書籍、偏好藍色...",
+                btn_cancel: "取消",
+                btn_save_bday: "儲存生日",
+                new_category_modal_title: "建立新分類標籤",
+                cat_name_label: "標籤名稱 *",
+                cat_ph: "例如：大學同學、閨蜜、工作夥伴",
+                cat_color_label: "標籤配色",
+                btn_create_label: "建立標籤",
+                log_modal_title: "記錄活動 / 回憶",
+                log_modal_sub: "記錄你在生日當天或先前為對方做了什麼",
+                log_select_person: "選擇對象 *",
+                log_type_label: "活動類型 *",
+                log_date_label: "日期 *",
+                log_notes_label: "詳細內容與回憶 *",
+                log_ph: "例如：送了 $50 禮物卡，早上打電話祝福，中午一起去溫馨咖啡館用餐！",
+                btn_save_log: "儲存紀錄",
+                btn_delete: "確認刪除",
+                turning: "即將滿",
+                years_old: "歲",
+                spotlight: "下一個生日焦點",
+                time_remaining: "倒數計時",
+                days: "天",
+                hours: "小時",
+                mins: "分鐘",
+                secs: "秒",
+                log_celebration: "紀錄慶祝活動",
+                no_bdays_title: "尚未新增任何生日",
+                no_bdays_desc: "立即新增親朋好友的生日，開啟即時倒數計時與回憶日誌功能！",
+                add_first_bday: "新增第一個生日",
+                no_cats_title: "尚未建立自訂分類標籤",
+                no_cats_desc: "建立標籤（如：家人、朋友、同事）以便歸類管理您的生日提醒。",
+                create_first_cat: "建立第一個標籤",
+                today: "🎉 今天生日！",
+                in_days: "天後",
+                confirm_delete_bday: "刪除生日提醒",
+                confirm_delete_bday_msg: "確定要刪除此生日條目嗎？",
+                confirm_delete_cat: "刪除分類標籤",
+                confirm_delete_cat_msg: "確定要刪除此標籤嗎？屬於該標籤的生日將被重新歸類。",
+                confirm_delete_log: "刪除回憶紀錄",
+                confirm_delete_log_msg: "確定要刪除此活動紀錄嗎？",
+                btn_sign_in: "登入帳號",
+                btn_sign_out: "登出帳號",
+                auth_modal_title: "雲端帳號與備份同步",
+                auth_desc: "登入帳號以自動將您的生日提醒、自訂標籤及回憶日誌備份至雲端，確保進度不丟失。",
+                auth_status_label: "目前狀態",
+                auth_status_signed_in: "已登入並連線雲端",
+                auth_status_guest: "以訪客身份登入 (已同步雲端)",
+                auth_status_offline: "離線 / 本地儲存",
+                btn_sign_in_guest: "登入並啟用雲端同步",
+                btn_sync_now: "立即同步雲端資料",
+                synced: "已儲存至雲端",
+                syncing: "同步中...",
+                sync_error: "同步失敗",
+                local_only: "僅本地儲存",
+                auth_signed_in_toast: "已成功登入並同步進度！",
+                auth_signed_out_toast: "已登出雲端帳號。"
+            },
+            'zh-CN': {
+                tagline: "生日提醒与回忆日志",
+                nav_dashboard: "主页仪表板",
+                nav_birthdays: "所有生日",
+                nav_categories: "分类标签",
+                nav_activity: "回忆与日志",
+                nav_auth: "账号同步",
+                add_btn: "添加生日",
+                stat_total: "总生日提醒",
+                stat_month: "本月生日",
+                stat_logs: "已记录回忆",
+                upcoming_title: "即将到来",
+                view_all: "查看全部 →",
+                plan_ahead_title: "提前规划",
+                plan_ahead_desc: "记录已发送的贺卡、购买的礼物或祝福消息，永远不忘记你的心意！",
+                log_memory_btn: "记录庆祝 / 活动回忆",
+                category_breakdown: "分类统计",
+                manage_btn: "管理标签",
+                all_birthdays_title: "所有生日名单",
+                all_birthdays_sub: "搜索、筛选及管理所有已保存的生日提醒",
+                search_placeholder: "搜索姓名或备注...",
+                sort_days: "按剩余天数排序",
+                sort_name: "按姓名排序",
+                sort_month: "按月份排序",
+                categories_title: "自定义分类标签",
+                categories_sub: "以自定义分组（家人、朋友、同事、VIP 等）轻松分类管理生日",
+                new_category: "添加标签",
+                activity_title: "活动与回忆日志",
+                activity_sub: "记录送出的礼物、通话祝福、聚会笔记与珍贵庆祝回忆。",
+                log_action_btn: "添加活动记录",
+                filter_log: "筛选记录：",
+                all_people: "所有对象",
+                add_birthday_modal_title: "添加生日提醒",
+                form_person_name: "全名 / 称呼 *",
+                form_dob: "出生日期 *",
+                form_category: "分类标签 *",
+                form_accent: "头像主题色系",
+                form_notes: "礼物灵感与备注",
+                notes_ph: "喜欢咖啡、书籍、偏好蓝色...",
+                btn_cancel: "取消",
+                btn_save_bday: "保存生日",
+                new_category_modal_title: "创建新分类标签",
+                cat_name_label: "标签名称 *",
+                cat_ph: "例如：大学同学、闺蜜、工作伙伴",
+                cat_color_label: "标签配色",
+                btn_create_label: "创建标签",
+                log_modal_title: "记录活动 / 回忆",
+                log_modal_sub: "记录你在生日当天或先前为对方做了什么",
+                log_select_person: "选择对象 *",
+                log_type_label: "活动类型 *",
+                log_date_label: "日期 *",
+                log_notes_label: "详细内容与回忆 *",
+                log_ph: "例如：送了 $50 礼物卡，早上打电话祝福，中午一起去温馨咖啡馆用餐！",
+                btn_save_log: "保存记录",
+                btn_delete: "确认删除",
+                turning: "即将满",
+                years_old: "岁",
+                spotlight: "下一个生日焦点",
+                time_remaining: "倒计时",
+                days: "天",
+                hours: "小时",
+                mins: "分钟",
+                secs: "秒",
+                log_celebration: "记录庆祝活动",
+                no_bdays_title: "尚未添加任何生日",
+                no_bdays_desc: "立即添加亲朋好友的生日，开启实时倒计时与回忆日志功能！",
+                add_first_bday: "添加第一个生日",
+                no_cats_title: "尚未创建自定义分类标签",
+                no_cats_desc: "创建标签（如：家人、朋友、同事）以便归类管理您的生日提醒。",
+                create_first_cat: "创建第一个标签",
+                today: "🎉 今天生日！",
+                in_days: "天后",
+                confirm_delete_bday: "删除生日提醒",
+                confirm_delete_bday_msg: "确定要删除此生日条目吗？",
+                confirm_delete_cat: "删除分类标签",
+                confirm_delete_cat_msg: "确定要删除此标签吗？属于该标签的生日将被重新归类。",
+                confirm_delete_log: "删除回忆记录",
+                confirm_delete_log_msg: "确定要删除此活动记录吗？",
+                btn_sign_in: "登录账号",
+                btn_sign_out: "登出账号",
+                auth_modal_title: "云端账号与备份同步",
+                auth_desc: "登录账号以自动将您的生日提醒、自定义标签及回忆日志备份至云端，确保进度不丢失。",
+                auth_status_label: "当前状态",
+                auth_status_signed_in: "已登录并连接云端",
+                auth_status_guest: "以访客身份登录 (已同步云端)",
+                auth_status_offline: "离线 / 本地存储",
+                btn_sign_in_guest: "登录并启用云端同步",
+                btn_sync_now: "立即同步云端数据",
+                synced: "已保存至云端",
+                syncing: "同步中...",
+                sync_error: "同步失败",
+                local_only: "仅本地存储",
+                auth_signed_in_toast: "已成功登录并同步进度！",
+                auth_signed_out_toast: "已登出云端账号。"
+            }
+        };
+
+        // Default initial categories
+        const defaultCategories = [
+            { id: 'cat-family', name: 'Family', color: 'cafe' },
+            { id: 'cat-friends', name: 'Friends', color: 'sage' },
+            { id: 'cat-work', name: 'Work', color: 'nordic' }
+        ];
+
+        // Application State
+        window.currentLang = localStorage.getItem('bday_lang') || 'en';
+        window.currentTheme = localStorage.getItem('bday_theme') || 'cafe';
+        window.categories = JSON.parse(localStorage.getItem('bday_categories')) || defaultCategories;
+        window.birthdays = JSON.parse(localStorage.getItem('bday_list')) || [];
+        window.logs = JSON.parse(localStorage.getItem('bday_logs')) || [];
+        
+        window.activeTab = 'dashboard';
+        window.activeCategoryFilter = 'all';
+        window.tickerInterval = null;
+        window.pendingConfirmCallback = null;
+
+        const THEME_PARTICLES = {
+            cafe: ['☕', '✨', '🤎', '🌾'],
+            sage: ['🌿', '🍃', '🌱', '✨'],
+            nordic: ['❄️', '🧊', '✨', '💎'],
+            sunset: ['🍂', '🍁', '✨', '🌅'],
+            snowy: ['❄️', '❅', '❆', '✧'],
+            mocha: ['🌙', '✨', '☕', '⭐']
+        };
+
+        function spawnThemeParticles(themeName) {
+            const container = document.getElementById('particle-container');
+            if (!container) return;
+            container.innerHTML = '';
+            const particles = THEME_PARTICLES[themeName] || THEME_PARTICLES['cafe'];
+            const count = 18;
+            for (let i = 0; i < count; i++) {
+                const el = document.createElement('div');
+                el.className = 'ambient-particle';
+                el.innerText = particles[Math.floor(Math.random() * particles.length)];
+                
+                const left = Math.random() * 100;
+                const duration = 10 + Math.random() * 15;
+                const delay = Math.random() * 10;
+                const fontSize = 12 + Math.random() * 16;
+                el.style.left = `${left}vw`;
+                el.style.animationDuration = `${duration}s`;
+                el.style.animationDelay = `${delay}s`;
+                el.style.fontSize = `${fontSize}px`;
+                container.appendChild(el);
+            }
+        }
+
+        window.changeTheme = function(themeName, shouldSave = true) {
+            window.currentTheme = themeName;
+            document.documentElement.setAttribute('data-theme', themeName);
+            const select = document.getElementById('theme-select');
+            if (select) select.value = themeName;
+            spawnThemeParticles(themeName);
+            if (shouldSave) saveState();
+        }
+
+        window.changeLanguage = function(langCode, shouldSave = true) {
+            window.currentLang = langCode;
+            const select = document.getElementById('lang-select');
+            if (select) select.value = langCode;
+            applyLanguage();
+            if (shouldSave) saveState();
+            renderAll();
+        }
+
+        function applyLanguage() {
+            const dict = i18n[window.currentLang] || i18n['en'];
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (dict[key]) {
+                    el.innerText = dict[key];
+                }
+            });
+            document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+                const key = el.getAttribute('data-i18n-ph');
+                if (dict[key]) {
+                    el.placeholder = dict[key];
+                }
+            });
+        }
+
+        window.t = function(key) {
+            const dict = i18n[window.currentLang] || i18n['en'];
+            return dict[key] || key;
+        }
+
+        window.saveLocalOnly = function() {
+            localStorage.setItem('bday_lang', window.currentLang);
+            localStorage.setItem('bday_theme', window.currentTheme);
+            localStorage.setItem('bday_categories', JSON.stringify(window.categories));
+            localStorage.setItem('bday_list', JSON.stringify(window.birthdays));
+            localStorage.setItem('bday_logs', JSON.stringify(window.logs));
+        }
+
+        function saveState() {
+            window.saveLocalOnly();
+            if (typeof window.saveStateToCloud === 'function') {
+                window.saveStateToCloud();
+            }
+        }
+
+        window.manualCloudSync = function() {
+            if (typeof window.saveStateToCloud === 'function') {
+                window.saveStateToCloud();
+                showToast(t('synced'), 'success');
+            }
+        }
+
+        function getAvatarStyle(colorKey) {
+            const colors = {
+                cafe: 'background-color: #C87D55; color: #FFFFFF;',
+                sage: 'background-color: #4A7C59; color: #FFFFFF;',
+                nordic: 'background-color: #2C5282; color: #FFFFFF;',
+                sunset: 'background-color: #E07A5F; color: #FFFFFF;',
+                snowy: 'background-color: #0284C7; color: #FFFFFF;',
+                amber: 'background-color: #D4A373; color: #FFFFFF;'
+            };
+            return colors[colorKey] || colors['cafe'];
+        }
+
+        function getBadgeStyle(colorKey) {
+            const colors = {
+                cafe: 'background-color: #F3ECE1; color: #8C5333; border: 1px solid #E6DCCE;',
+                sage: 'background-color: #E3EFE0; color: #1C3322; border: 1px solid #C2DCC0;',
+                nordic: 'background-color: #D3E2EE; color: #0F2032; border: 1px solid #B5CCE0;',
+                sunset: 'background-color: #FDE2D4; color: #421D12; border: 1px solid #F7C3AD;',
+                snowy: 'background-color: #DDF0FC; color: #0B2545; border: 1px solid #B9E1F8;',
+                amber: 'background-color: #FAF0E6; color: #8C6239; border: 1px solid #EAD8C7;'
+            };
+            return colors[colorKey] || colors['cafe'];
+        }
+
+        function getNextBirthdayInfo(dobString) {
+            if (!dobString) return { daysLeft: 999, age: 0, nextBdayDate: new Date() };
+            const today = new Date();
+            const parts = dobString.split('-');
+            const birthYear = parseInt(parts[0], 10);
+            const birthMonth = parseInt(parts[1], 10) - 1;
+            const birthDay = parseInt(parts[2], 10);
+
+            let nextBday = new Date(today.getFullYear(), birthMonth, birthDay, 0, 0, 0);
+            const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+            if (nextBday < todayStart) {
+                nextBday.setFullYear(today.getFullYear() + 1);
+            }
+            const diffTime = nextBday - todayStart;
+            const daysLeft = Math.round(diffTime / (1000 * 60 * 60 * 24));
+            const upcomingAge = nextBday.getFullYear() - birthYear;
+            return { daysLeft, age: upcomingAge, nextBdayDate: nextBday };
+        }
+
+        window.switchTab = function(tabName) {
+            window.activeTab = tabName;
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            const currentTab = document.getElementById(`tab-${tabName}`);
+            if (currentTab) currentTab.classList.remove('hidden');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('theme-hero', 'text-white');
+                btn.classList.add('theme-text-muted');
+            });
+            const activeNavBtn = document.getElementById(`nav-${tabName}`);
+            if (activeNavBtn) {
+                activeNavBtn.classList.add('theme-hero', 'text-white');
+                activeNavBtn.classList.remove('theme-text-muted');
+            }
+
+            document.querySelectorAll('.mobile-nav-btn').forEach(btn => {
+                btn.classList.remove('theme-hero', 'text-white');
+            });
+            const activeMobileBtn = document.getElementById(`mobile-nav-${tabName}`);
+            if (activeMobileBtn) {
+                activeMobileBtn.classList.add('theme-hero', 'text-white');
+            }
+
+            renderAll();
+        }
+
+        window.renderAll = function() {
+            renderDashboardHero();
+            renderStats();
+            renderUpcoming();
+            renderCategorySummary();
+            renderBirthdaysList();
+            renderCategoriesGrid();
+            renderActivityLogs();
+            populateCategorySelects();
+            populatePersonSelects();
+        }
+
+        function renderStats() {
+            document.getElementById('stat-total').innerText = window.birthdays.length;
+            const currentMonth = new Date().getMonth();
+            const thisMonthCount = window.birthdays.filter(b => {
+                const dob = new Date(b.date);
+                return dob.getMonth() === currentMonth;
+            }).length;
+            document.getElementById('stat-month').innerText = thisMonthCount;
+            document.getElementById('stat-logs').innerText = window.logs.length;
+        }
+
+        function renderDashboardHero() {
+            const container = document.getElementById('hero-countdown-container');
+            if (!container) return;
+
+            if (window.birthdays.length === 0) {
+                container.className = "relative rounded-3xl overflow-hidden shadow-md theme-hero text-white p-6 sm:p-8 md:p-10 text-center space-y-3";
+                container.innerHTML = `
+                    <div class="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-3xl mx-auto shadow-inner">
+                        <i class="fa-solid fa-cake-candles"></i>
+                    </div>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold">${t('no_bdays_title')}</h2>
+                    <p class="text-sm opacity-90 max-w-md mx-auto">${t('no_bdays_desc')}</p>
+                    <button onclick="openAddModal()" class="mt-2 inline-flex items-center px-5 py-2.5 bg-white text-gray-900 font-bold text-sm rounded-xl shadow-lg hover:bg-opacity-90 transition">
+                        <i class="fa-solid fa-plus mr-2"></i> ${t('add_first_bday')}
+                    </button>
+                `;
+                if (window.tickerInterval) clearInterval(window.tickerInterval);
+                return;
+            }
+
+            const sorted = [...window.birthdays].map(b => ({
+                ...b,
+                info: getNextBirthdayInfo(b.date)
+            })).sort((a, b) => a.info.daysLeft - b.info.daysLeft);
+
+            const next = sorted[0];
+            const catObj = window.categories.find(c => c.id === next.categoryId) || { name: 'General', color: 'cafe' };
+
+            container.className = "relative rounded-3xl overflow-hidden shadow-md theme-hero text-white p-6 sm:p-8 md:p-10 transition-all duration-300";
+            container.innerHTML = `
+                <div class="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
+                    <div class="space-y-3 text-center md:text-left flex-1">
+                        <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-bold uppercase tracking-wider">
+                            <i class="fa-solid fa-star text-amber-300"></i>
+                            <span>${t('spotlight')}</span>
+                        </div>
+                        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight">${next.name}</h1>
+                        <p class="text-sm sm:text-base opacity-95 font-medium">
+                            ${t('turning')} <span class="font-extrabold underline decoration-white/40">${next.info.age}</span> ${t('years_old')} • ${next.date}
+                        </p>
+                        <div class="pt-2 flex flex-wrap items-center justify-center md:justify-start gap-2">
+                            <span class="px-3 py-1 rounded-lg text-xs font-semibold bg-white/20 backdrop-blur-md">${catObj.name}</span>
+                            <button onclick="openLogModal('${next.id}')" class="px-3 py-1 rounded-lg text-xs font-bold bg-white text-gray-900 shadow hover:bg-white/90 transition flex items-center space-x-1">
+                                <i class="fa-solid fa-gift"></i>
+                                <span>${t('log_celebration')}</span>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Countdown Ticker Box -->
+                    <div class="bg-black/25 backdrop-blur-md p-4 sm:p-5 rounded-2xl border border-white/20 text-center min-w-[260px] shadow-lg">
+                        <p class="text-xs uppercase tracking-wider font-bold opacity-80 mb-3">${t('time_remaining')}</p>
+                        <div class="grid grid-cols-4 gap-2 text-center">
+                            <div class="bg-white/10 p-2 rounded-xl border border-white/10">
+                                <span id="ticker-days" class="block text-2xl font-extrabold">00</span>
+                                <span class="text-[10px] uppercase font-bold opacity-75">${t('days')}</span>
+                            </div>
+                            <div class="bg-white/10 p-2 rounded-xl border border-white/10">
+                                <span id="ticker-hours" class="block text-2xl font-extrabold">00</span>
+                                <span class="text-[10px] uppercase font-bold opacity-75">${t('hours')}</span>
+                            </div>
+                            <div class="bg-white/10 p-2 rounded-xl border border-white/10">
+                                <span id="ticker-mins" class="block text-2xl font-extrabold">00</span>
+                                <span class="text-[10px] uppercase font-bold opacity-75">${t('mins')}</span>
+                            </div>
+                            <div class="bg-white/10 p-2 rounded-xl border border-white/10">
+                                <span id="ticker-secs" class="block text-2xl font-extrabold">00</span>
+                                <span class="text-[10px] uppercase font-bold opacity-75">${t('secs')}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            startTicker(next.info.nextBdayDate);
+        }
+
+        function startTicker(targetDate) {
+            if (window.tickerInterval) clearInterval(window.tickerInterval);
+            function update() {
+                const now = new Date().getTime();
+                const diff = targetDate.getTime() - now;
+                if (diff <= 0) {
+                    document.getElementById('ticker-days').innerText = '00';
+                    document.getElementById('ticker-hours').innerText = '00';
+                    document.getElementById('ticker-mins').innerText = '00';
+                    document.getElementById('ticker-secs').innerText = '00';
+                    triggerConfetti();
+                    return;
+                }
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const secs = Math.floor((diff % (1000 * 60)) / 1000);
+
+                const dEl = document.getElementById('ticker-days');
+                if (dEl) dEl.innerText = String(days).padStart(2, '0');
+                const hEl = document.getElementById('ticker-hours');
+                if (hEl) hEl.innerText = String(hours).padStart(2, '0');
+                const mEl = document.getElementById('ticker-mins');
+                if (mEl) mEl.innerText = String(mins).padStart(2, '0');
+                const sEl = document.getElementById('ticker-secs');
+                if (sEl) sEl.innerText = String(secs).padStart(2, '0');
+            }
+            update();
+            window.tickerInterval = setInterval(update, 1000);
+        }
+
+        function triggerConfetti() {
+            if (typeof confetti === 'function') {
+                confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
+            }
+        }
+
+        function renderUpcoming() {
+            const list = document.getElementById('upcoming-list');
+            if (!list) return;
+
+            if (window.birthdays.length === 0) {
+                list.innerHTML = `<p class="text-sm theme-text-muted italic py-4 text-center">${t('no_bdays_desc')}</p>`;
+                return;
+            }
+
+            const items = [...window.birthdays].map(b => ({
+                ...b,
+                info: getNextBirthdayInfo(b.date)
+            })).sort((a, b) => a.info.daysLeft - b.info.daysLeft).slice(0, 4);
+
+            list.innerHTML = items.map(b => {
+                const catObj = window.categories.find(c => c.id === b.categoryId) || { name: 'General', color: 'cafe' };
+                const daysText = b.info.daysLeft === 0 ? t('today') : `${b.info.daysLeft} ${t('in_days')}`;
+                return `
+                    <div class="theme-card p-4 rounded-2xl border shadow-sm flex items-center justify-between transition hover:shadow-md">
+                        <div class="flex items-center space-x-3.5">
+                            <div class="w-11 h-11 rounded-xl flex items-center justify-center font-bold text-base shadow-sm" style="${getAvatarStyle(b.avatarColor)}">
+                                ${b.name.charAt(0).toUpperCase()}
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">${b.name}</h4>
+                                <p class="text-xs theme-text-muted font-medium">${b.date} • ${t('turning')} ${b.info.age}</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="px-2.5 py-1 rounded-full text-xs font-bold" style="${getBadgeStyle(catObj.color)}">
+                                ${daysText}
+                            </span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderCategorySummary() {
+            const list = document.getElementById('category-summary-list');
+            if (!list) return;
+
+            if (window.categories.length === 0) {
+                list.innerHTML = `<p class="text-xs theme-text-muted italic py-2">${t('no_cats_desc')}</p>`;
+                return;
+            }
+
+            list.innerHTML = window.categories.map(cat => {
+                const count = window.birthdays.filter(b => b.categoryId === cat.id).length;
+                return `
+                    <div class="flex items-center justify-between p-2 rounded-xl theme-subcard">
+                        <span class="text-xs font-semibold flex items-center">
+                            <span class="w-2.5 h-2.5 rounded-full mr-2" style="${getAvatarStyle(cat.color)}"></span>
+                            ${cat.name}
+                        </span>
+                        <span class="text-xs font-bold px-2 py-0.5 rounded-md theme-card border theme-border">${count}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderBirthdaysList() {
+            const grid = document.getElementById('birthdays-grid');
+            const pills = document.getElementById('category-filter-pills');
+            if (!grid) return;
+
+            // Render filter pills
+            if (pills) {
+                pills.innerHTML = `
+                    <button onclick="setCategoryFilter('all')" class="px-3 py-1.5 rounded-xl text-xs font-bold transition ${window.activeCategoryFilter === 'all' ? 'theme-hero text-white shadow-sm' : 'theme-subcard border theme-border theme-text-muted'}">
+                        ${t('all_people')} (${window.birthdays.length})
+                    </button>
+                    ${window.categories.map(cat => {
+                        const count = window.birthdays.filter(b => b.categoryId === cat.id).length;
+                        const isActive = window.activeCategoryFilter === cat.id;
+                        return `
+                            <button onclick="setCategoryFilter('${cat.id}')" class="px-3 py-1.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${isActive ? 'theme-hero text-white shadow-sm' : 'theme-subcard border theme-border theme-text-muted'}">
+                                ${cat.name} (${count})
+                            </button>
+                        `;
+                    }).join('')}
+                `;
+            }
+
+            const searchVal = (document.getElementById('search-input')?.value || '').toLowerCase();
+            const sortVal = document.getElementById('sort-select')?.value || 'days';
+
+            let filtered = window.birthdays.filter(b => {
+                const matchesCategory = window.activeCategoryFilter === 'all' || b.categoryId === window.activeCategoryFilter;
+                const matchesSearch = b.name.toLowerCase().includes(searchVal) || (b.notes && b.notes.toLowerCase().includes(searchVal));
+                return matchesCategory && matchesSearch;
+            }).map(b => ({
+                ...b,
+                info: getNextBirthdayInfo(b.date)
+            }));
+
+            if (sortVal === 'days') {
+                filtered.sort((a, b) => a.info.daysLeft - b.info.daysLeft);
+            } else if (sortVal === 'name') {
+                filtered.sort((a, b) => a.name.localeCompare(b.name));
+            } else if (sortVal === 'month') {
+                filtered.sort((a, b) => new Date(a.date).getMonth() - new Date(b.date).getMonth());
+            }
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full theme-card p-10 rounded-3xl border text-center space-y-3">
+                        <div class="w-14 h-14 rounded-2xl theme-subcard flex items-center justify-center text-2xl mx-auto text-amber-600">
+                            <i class="fa-solid fa-cake-candles"></i>
+                        </div>
+                        <h3 class="font-bold text-base">${t('no_bdays_title')}</h3>
+                        <p class="text-xs theme-text-muted max-w-sm mx-auto">${t('no_bdays_desc')}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(b => {
+                const catObj = window.categories.find(c => c.id === b.categoryId) || { name: 'General', color: 'cafe' };
+                const daysBadge = b.info.daysLeft === 0 ? t('today') : `${b.info.daysLeft} ${t('in_days')}`;
+
+                return `
+                    <div class="theme-card rounded-2xl p-5 border shadow-sm relative space-y-4 hover:shadow-md transition">
+                        <div class="flex items-start justify-between">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-lg shadow-sm" style="${getAvatarStyle(b.avatarColor)}">
+                                    ${b.name.charAt(0).toUpperCase()}
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-base">${b.name}</h3>
+                                    <span class="px-2 py-0.5 rounded-md text-[11px] font-semibold" style="${getBadgeStyle(catObj.color)}">${catObj.name}</span>
+                                </div>
+                            </div>
+                            <span class="text-xs font-bold px-2.5 py-1 rounded-full theme-subcard border theme-border">
+                                ${daysBadge}
+                            </span>
+                        </div>
+
+                        <div class="text-xs space-y-1 theme-subcard p-3 rounded-xl border theme-border font-medium">
+                            <div class="flex justify-between">
+                                <span class="theme-text-muted">${t('form_dob')}:</span>
+                                <span>${b.date}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="theme-text-muted">${t('turning')}:</span>
+                                <span>${b.info.age} ${t('years_old')}</span>
+                            </div>
+                            ${b.notes ? `<div class="pt-1 text-xs theme-text-muted border-t border-black/5"><i class="fa-solid fa-note-sticky mr-1"></i> ${b.notes}</div>` : ''}
+                        </div>
+
+                        <div class="flex items-center justify-between pt-1">
+                            <button onclick="openLogModal('${b.id}')" class="text-xs font-bold theme-primary-btn px-3 py-1.5 rounded-lg shadow-sm flex items-center space-x-1">
+                                <i class="fa-solid fa-pen-to-square"></i> <span>${t('log_action_btn')}</span>
+                            </button>
+                            <div class="flex items-center space-x-2">
+                                <button onclick="openEditBirthday('${b.id}')" class="w-8 h-8 rounded-lg theme-subcard theme-text-muted hover:opacity-100 flex items-center justify-center transition">
+                                    <i class="fa-solid fa-pen text-xs"></i>
+                                </button>
+                                <button onclick="confirmDeleteBirthday('${b.id}')" class="w-8 h-8 rounded-lg bg-rose-500/10 text-rose-500 hover:bg-rose-500/20 flex items-center justify-center transition">
+                                    <i class="fa-solid fa-trash-can text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        window.setCategoryFilter = function(catId) {
+            window.activeCategoryFilter = catId;
+            renderBirthdaysList();
+        }
+
+        function renderCategoriesGrid() {
+            const grid = document.getElementById('categories-grid');
+            if (!grid) return;
+
+            if (window.categories.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full theme-card p-8 rounded-3xl border text-center space-y-3">
+                        <h3 class="font-bold text-base">${t('no_cats_title')}</h3>
+                        <p class="text-xs theme-text-muted">${t('no_cats_desc')}</p>
+                        <button onclick="openAddCategoryModal()" class="px-4 py-2 theme-primary-btn text-xs font-bold rounded-xl">${t('create_first_cat')}</button>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = window.categories.map(cat => {
+                const count = window.birthdays.filter(b => b.categoryId === cat.id).length;
+                return `
+                    <div class="theme-card p-5 rounded-2xl border shadow-sm flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-xl flex items-center justify-center font-bold" style="${getAvatarStyle(cat.color)}">
+                                <i class="fa-solid fa-tag"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">${cat.name}</h4>
+                                <p class="text-xs theme-text-muted">${count} ${t('stat_total')}</p>
+                            </div>
+                        </div>
+                        <button onclick="confirmDeleteCategory('${cat.id}')" class="w-8 h-8 rounded-lg bg-rose-500/10 text-rose-500 hover:bg-rose-500/20 flex items-center justify-center transition">
+                            <i class="fa-solid fa-trash-can text-xs"></i>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderActivityLogs() {
+            const timeline = document.getElementById('logs-timeline');
+            const filterVal = document.getElementById('log-person-filter')?.value || 'all';
+            if (!timeline) return;
+
+            let filteredLogs = window.logs;
+            if (filterVal !== 'all') {
+                filteredLogs = window.logs.filter(l => l.personId === filterVal);
+            }
+
+            if (filteredLogs.length === 0) {
+                timeline.innerHTML = `<p class="text-xs theme-text-muted italic py-4">${t('activity_sub')}</p>`;
+                return;
+            }
+
+            timeline.innerHTML = filteredLogs.map(log => {
+                const person = window.birthdays.find(b => b.id === log.personId) || { name: 'Unknown Person' };
+                return `
+                    <div class="relative group">
+                        <div class="absolute -left-[31px] top-1.5 w-3.5 h-3.5 rounded-full border-2 theme-card" style="background-color: var(--primary); border-color: var(--bg-card);"></div>
+                        <div class="theme-subcard p-4 rounded-2xl border theme-border space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold px-2.5 py-1 rounded-lg theme-card border theme-border" style="color: var(--primary);">
+                                    ${log.type}
+                                </span>
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-xs font-medium theme-text-muted">${log.date}</span>
+                                    <button onclick="confirmDeleteLog('${log.id}')" class="text-rose-500 hover:opacity-80 text-xs px-1">
+                                        <i class="fa-solid fa-xmark"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <h4 class="font-bold text-sm">${person.name}</h4>
+                            <p class="text-xs theme-text-muted leading-relaxed">${log.notes}</p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function populateCategorySelects() {
+            const bdayCatSelect = document.getElementById('bday-category');
+            if (bdayCatSelect) {
+                bdayCatSelect.innerHTML = window.categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+            }
+        }
+
+        function populatePersonSelects() {
+            const selects = [document.getElementById('log-person-select'), document.getElementById('log-person-filter')];
+            selects.forEach(select => {
+                if (!select) return;
+                const isFilter = select.id === 'log-person-filter';
+                let opts = isFilter ? `<option value="all">${t('all_people')}</option>` : '';
+                opts += window.birthdays.map(b => `<option value="${b.id}">${b.name}</option>`).join('');
+                select.innerHTML = opts;
+            });
+        }
+
+        window.openAddModal = function() {
+            document.getElementById('form-birthday').reset();
+            document.getElementById('bday-id').value = '';
+            document.getElementById('modal-bday-title').innerText = t('add_birthday_modal_title');
+            selectAvatarColor('cafe');
+            document.getElementById('modal-birthday').classList.remove('hidden');
+        }
+
+        window.closeAddModal = function() {
+            document.getElementById('modal-birthday').classList.add('hidden');
+        }
+
+        window.openEditBirthday = function(id) {
+            const item = window.birthdays.find(b => b.id === id);
+            if (!item) return;
+            document.getElementById('bday-id').value = item.id;
+            document.getElementById('bday-name').value = item.name;
+            document.getElementById('bday-date').value = item.date;
+            document.getElementById('bday-category').value = item.categoryId;
+            document.getElementById('bday-notes').value = item.notes || '';
+            selectAvatarColor(item.avatarColor || 'cafe');
+            document.getElementById('modal-bday-title').innerText = 'Edit Birthday';
+            document.getElementById('modal-birthday').classList.remove('hidden');
+        }
+
+        window.selectAvatarColor = function(colorKey) {
+            document.getElementById('bday-color').value = colorKey;
+            document.querySelectorAll('#color-picker-group button').forEach(btn => {
+                if (btn.getAttribute('data-color') === colorKey) {
+                    btn.classList.add('ring-2', 'ring-offset-2');
+                } else {
+                    btn.classList.remove('ring-2', 'ring-offset-2');
+                }
+            });
+        }
+
+        window.handleBirthdaySubmit = function(e) {
+            e.preventDefault();
+            const id = document.getElementById('bday-id').value;
+            const name = document.getElementById('bday-name').value.trim();
+            const date = document.getElementById('bday-date').value;
+            const categoryId = document.getElementById('bday-category').value;
+            const avatarColor = document.getElementById('bday-color').value;
+            const notes = document.getElementById('bday-notes').value.trim();
+
+            if (id) {
+                const idx = window.birthdays.findIndex(b => b.id === id);
+                if (idx !== -1) {
+                    window.birthdays[idx] = { ...window.birthdays[idx], name, date, categoryId, avatarColor, notes };
+                }
+            } else {
+                window.birthdays.push({
+                    id: 'bday-' + Date.now(),
+                    name,
+                    date,
+                    categoryId,
+                    avatarColor,
+                    notes
+                });
+            }
+            saveState();
+            closeAddModal();
+            renderAll();
+            showToast("Birthday saved successfully!", "success");
+        }
+
+        window.openAddCategoryModal = function() {
+            document.getElementById('form-category').reset();
+            document.getElementById('modal-category').classList.remove('hidden');
+        }
+
+        window.closeCategoryModal = function() {
+            document.getElementById('modal-category').classList.add('hidden');
+        }
+
+        window.handleCategorySubmit = function(e) {
+            e.preventDefault();
+            const name = document.getElementById('cat-name').value.trim();
+            const color = document.getElementById('cat-color').value;
+            window.categories.push({
+                id: 'cat-' + Date.now(),
+                name,
+                color
+            });
+            saveState();
+            closeCategoryModal();
+            renderAll();
+            showToast("Category label created!", "success");
+        }
+
+        window.openLogModal = function(personId = null) {
+            document.getElementById('form-log').reset();
+            document.getElementById('log-date').valueAsDate = new Date();
+            if (personId) {
+                document.getElementById('log-person-select').value = personId;
+            }
+            document.getElementById('modal-log').classList.remove('hidden');
+        }
+
+        window.closeLogModal = function() {
+            document.getElementById('modal-log').classList.add('hidden');
+        }
+
+        window.handleLogSubmit = function(e) {
+            e.preventDefault();
+            const personId = document.getElementById('log-person-select').value;
+            const type = document.getElementById('log-type').value;
+            const date = document.getElementById('log-date').value;
+            const notes = document.getElementById('log-notes').value.trim();
+
+            window.logs.unshift({
+                id: 'log-' + Date.now(),
+                personId,
+                type,
+                date,
+                notes
+            });
+            saveState();
+            closeLogModal();
+            renderAll();
+            showToast("Activity log saved!", "success");
+        }
+
+        window.openAuthModal = function() {
+            document.getElementById('modal-auth').classList.remove('hidden');
+        }
+
+        window.closeAuthModal = function() {
+            document.getElementById('modal-auth').classList.add('hidden');
+        }
+
+        // Custom Confirm Dialog
+        window.confirmDeleteBirthday = function(id) {
+            showConfirm(t('confirm_delete_bday'), t('confirm_delete_bday_msg'), () => {
+                window.birthdays = window.birthdays.filter(b => b.id !== id);
+                saveState();
+                renderAll();
+                showToast("Birthday deleted.", "info");
+            });
+        }
+
+        window.confirmDeleteCategory = function(catId) {
+            showConfirm(t('confirm_delete_cat'), t('confirm_delete_cat_msg'), () => {
+                window.categories = window.categories.filter(c => c.id !== catId);
+                saveState();
+                renderAll();
+                showToast("Category removed.", "info");
+            });
+        }
+
+        window.confirmDeleteLog = function(logId) {
+            showConfirm(t('confirm_delete_log'), t('confirm_delete_log_msg'), () => {
+                window.logs = window.logs.filter(l => l.id !== logId);
+                saveState();
+                renderAll();
+                showToast("Log entry deleted.", "info");
+            });
+        }
+
+        function showConfirm(title, msg, onOk) {
+            document.getElementById('confirm-title').innerText = title;
+            document.getElementById('confirm-msg').innerText = msg;
+            window.pendingConfirmCallback = onOk;
+            document.getElementById('modal-confirm').classList.remove('hidden');
+        }
+
+        window.closeConfirmModal = function(confirmed) {
+            document.getElementById('modal-confirm').classList.add('hidden');
+            if (confirmed && typeof window.pendingConfirmCallback === 'function') {
+                window.pendingConfirmCallback();
+            }
+            window.pendingConfirmCallback = null;
+        }
+
+        window.showToast = function(msg, type = 'info') {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+            const toast = document.createElement('div');
+            const bgClass = type === 'success' ? 'bg-emerald-600' : (type === 'error' ? 'bg-rose-600' : 'bg-stone-800');
+            toast.className = `${bgClass} text-white px-4 py-3 rounded-xl shadow-xl text-xs font-semibold flex items-center space-x-2 pointer-events-auto transition-all duration-300 transform translate-y-2 opacity-0`;
+            toast.innerHTML = `<i class="fa-solid fa-circle-info"></i><span>${msg}</span>`;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Initialize theme & language on load
+        window.onload = function() {
+            changeTheme(window.currentTheme, false);
+            changeLanguage(window.currentLang, false);
+        };
+    </script>
+
+    <!-- Firebase Script Module for Real-time Cloud Sign In & Sync -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'bday-pulse-app';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' 
+            ? JSON.parse(__firebase_config) 
+            : {
+                apiKey: "AIzaSyDummyKeyForFallbackOnly",
+                authDomain: "bday-pulse.firebaseapp.com",
+                projectId: "bday-pulse",
+                storageBucket: "bday-pulse.appspot.com",
+                messagingSenderId: "123456789",
+                appId: "1:123456789:web:123456789"
+            };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUser = null;
+        let unsubscribeDoc = null;
+
+        window.initAuth = async function() {
+            const initialToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+            try {
+                if (initialToken) {
+                    await signInWithCustomToken(auth, initialToken);
+                } else if (!auth.currentUser) {
+                    await signInAnonymously(auth);
+                }
+            } catch (err) {
+                console.warn("Auth initialization notice:", err);
+                if (!auth.currentUser) {
+                    try { await signInAnonymously(auth); } catch(e) {}
+                }
+            }
+        };
+
+        onAuthStateChanged(auth, (user) => {
+            currentUser = user;
+            window.currentUser = user;
+            updateAuthUI(user);
+            if (user) {
+                listenToUserData(user);
+            } else {
+                if (unsubscribeDoc) unsubscribeDoc();
+                updateSyncStatusUI('offline');
+            }
+        });
+
+        function listenToUserData(user) {
+            if (!user) return;
+            const userDocRef = doc(db, 'artifacts', appId, 'users', user.uid, 'userData', 'main');
+            if (unsubscribeDoc) unsubscribeDoc();
+
+            updateSyncStatusUI('syncing');
+            unsubscribeDoc = onSnapshot(userDocRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    if (Array.isArray(data.birthdays)) window.birthdays = data.birthdays;
+                    if (Array.isArray(data.categories)) window.categories = data.categories;
+                    if (Array.isArray(data.logs)) window.logs = data.logs;
+                    if (data.currentTheme) window.changeTheme(data.currentTheme, false);
+                    if (data.currentLang) window.changeLanguage(data.currentLang, false);
+                    window.saveLocalOnly();
+                    window.renderAll();
+                    updateSyncStatusUI('synced');
+                } else {
+                    window.saveStateToCloud();
+                }
+            }, (err) => {
+                console.error("Firestore sync error:", err);
+                updateSyncStatusUI('error');
+            });
+        }
+
+        window.saveStateToCloud = async function() {
+            if (!currentUser) return;
+            try {
+                updateSyncStatusUI('syncing');
+                const userDocRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'userData', 'main');
+                await setDoc(userDocRef, {
+                    birthdays: window.birthdays || [],
+                    categories: window.categories || [],
+                    logs: window.logs || [],
+                    currentTheme: window.currentTheme || 'cafe',
+                    currentLang: window.currentLang || 'en',
+                    updatedAt: new Date().toISOString()
+                }, { merge: true });
+                updateSyncStatusUI('synced');
+            } catch (err) {
+                console.error("Cloud save failed:", err);
+                updateSyncStatusUI('error');
+            }
+        };
+
+        window.performSignInGuest = async function() {
+            try {
+                updateSyncStatusUI('syncing');
+                await signInAnonymously(auth);
+                window.showToast(window.t('auth_signed_in_toast'), 'success');
+                window.closeAuthModal();
+            } catch (err) {
+                window.showToast("Sign in failed: " + err.message, 'error');
+            }
+        };
+
+        window.performSignOut = async function() {
+            try {
+                await signOut(auth);
+                window.showToast(window.t('auth_signed_out_toast'), 'info');
+                window.closeAuthModal();
+            } catch (err) {
+                window.showToast("Sign out failed: " + err.message, 'error');
+            }
+        };
+
+        function updateAuthUI(user) {
+            const statusBtnText = document.getElementById('auth-status-text');
+            const statusDot = document.getElementById('auth-status-dot');
+            const modalUserEmail = document.getElementById('modal-user-id');
+            const modalBadge = document.getElementById('modal-user-badge');
+            const signOutBtn = document.getElementById('btn-signout');
+            const signInBtn = document.getElementById('btn-signin');
+
+            if (user) {
+                const isAnon = user.isAnonymous;
+                const displayId = user.email || (isAnon ? `Guest (${user.uid.substring(0, 6)}...)` : user.uid.substring(0, 8));
+                
+                if (statusBtnText) statusBtnText.innerText = isAnon ? `Guest` : (user.email ? user.email.split('@')[0] : 'Account');
+                if (statusDot) {
+                    statusDot.className = "w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
+                }
+                if (modalUserEmail) modalUserEmail.innerText = user.email || user.uid;
+                if (modalBadge) {
+                    modalBadge.innerText = isAnon ? window.t('auth_status_guest') : window.t('auth_status_signed_in');
+                    modalBadge.className = "px-2.5 py-1 text-[11px] font-bold rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-500/20";
+                }
+                if (signOutBtn) signOutBtn.classList.remove('hidden');
+                if (signInBtn) signInBtn.classList.add('hidden');
+            } else {
+                if (statusBtnText) statusBtnText.innerText = window.t('btn_sign_in');
+                if (statusDot) {
+                    statusDot.className = "w-2 h-2 rounded-full bg-amber-500";
+                }
+                if (modalUserEmail) modalUserEmail.innerText = window.t('auth_status_offline');
+                if (modalBadge) {
+                    modalBadge.innerText = window.t('auth_status_offline');
+                    modalBadge.className = "px-2.5 py-1 text-[11px] font-bold rounded-full bg-rose-500/10 text-rose-600 border border-rose-500/20";
+                }
+                if (signOutBtn) signOutBtn.classList.add('hidden');
+                if (signInBtn) signInBtn.classList.remove('hidden');
+            }
+        }
+
+        function updateSyncStatusUI(status) {
+            const syncBadge = document.getElementById('sync-indicator');
+            if (!syncBadge) return;
+            if (status === 'syncing') {
+                syncBadge.innerHTML = `<i class="fa-solid fa-arrows-rotate animate-spin mr-1"></i> <span>${window.t('syncing')}</span>`;
+                syncBadge.className = "inline-flex items-center text-[11px] font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200";
+            } else if (status === 'synced') {
+                syncBadge.innerHTML = `<i class="fa-solid fa-cloud-arrow-up text-emerald-500 mr-1"></i> <span>${window.t('synced')}</span>`;
+                syncBadge.className = "inline-flex items-center text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200";
+            } else if (status === 'error') {
+                syncBadge.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-rose-500 mr-1"></i> <span>${window.t('sync_error')}</span>`;
+                syncBadge.className = "inline-flex items-center text-[11px] font-semibold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-200";
+            } else {
+                syncBadge.innerHTML = `<i class="fa-solid fa-cloud text-gray-400 mr-1"></i> <span>${window.t('local_only')}</span>`;
+                syncBadge.className = "inline-flex items-center text-[11px] font-semibold text-gray-500 bg-gray-100 px-2 py-0.5 rounded-md border border-gray-200";
+            }
+        }
+
+        // Initialize authentication
+        window.initAuth();
+    </script>
+</body>
+</html>
+
+
