@@ -14,7 +14,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
     <!-- Canvas Confetti -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    
     <style>
         /* Relaxing Cafe Palette */
         :root[data-theme="cafe"] {
@@ -178,14 +177,6 @@
             background: var(--border-color);
             border-radius: 9999px;
         }
-
-        .spin {
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
     </style>
 </head>
 <body>
@@ -194,6 +185,7 @@
     <!-- Notification Toast Container -->
     <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
 
+    <!-- Navigation Header -->
     <header class="sticky top-0 z-30 theme-card backdrop-blur-md border-b shadow-sm transition-colors duration-300">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
@@ -282,6 +274,7 @@
         </button>
     </div>
 
+    <!-- Main Content Container -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-12 flex-1 w-full">
         <!-- DASHBOARD TAB -->
         <div id="tab-dashboard" class="tab-content space-y-8">
@@ -447,7 +440,7 @@
 
             <div>
                 <h3 class="text-xl font-extrabold" data-i18n="auth_modal_title">Cloud Account & Sync</h3>
-                <p class="text-xs theme-text-muted mt-1 px-4" data-i18n="auth_desc">Sign in to save your birthdays, custom categories, and celebration logs safely to the cloud so you can access them anywhere.</p>
+                <p class="text-xs theme-text-muted mt-1 px-4" data-i18n="auth_desc">Sign in to save your birthdays, custom categories, and celebration logs safely to the cloud so you can access them anywhere on multiple devices.</p>
             </div>
 
             <!-- Current Status Box -->
@@ -459,20 +452,17 @@
                 <p id="modal-user-id" class="text-xs font-mono font-semibold truncate theme-text-muted">Loading user profile...</p>
             </div>
 
-            <!-- Action Buttons with Google Sign In -->
+            <!-- Action Buttons -->
             <div class="space-y-3 pt-1">
-                <button id="btn-google-signin" onclick="performGoogleSignIn()" class="w-full py-3 bg-white hover:bg-gray-50 text-gray-800 border border-gray-300 font-semibold text-sm rounded-xl transition shadow-sm flex items-center justify-center space-x-2">
-                    <svg class="w-4 h-4" viewBox="0 0 24 24">
-                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-                    </svg>
-                    <span data-i18n="btn_google_signin">Sign in with Google</span>
+                <!-- Google Sign In Button -->
+                <button id="btn-signin-google" onclick="performSignInGoogle()" class="w-full py-3 theme-primary-btn font-semibold text-sm rounded-xl transition shadow-sm flex items-center justify-center space-x-2.5 transform active:scale-95">
+                    <i class="fa-brands fa-google text-base"></i>
+                    <span data-i18n="btn_sign_in_google">Sign In with Google</span>
                 </button>
 
-                <button id="btn-signin" onclick="performSignInGuest()" class="w-full py-2.5 theme-subcard font-semibold text-xs rounded-xl transition border theme-border flex items-center justify-center space-x-2">
-                    <i class="fa-solid fa-user-circle"></i>
+                <!-- Guest Sign In Button -->
+                <button id="btn-signin" onclick="performSignInGuest()" class="w-full py-2.5 theme-subcard font-semibold text-xs rounded-xl border theme-border hover:opacity-90 transition flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-user-secret"></i>
                     <span data-i18n="btn_sign_in_guest">Continue as Guest</span>
                 </button>
 
@@ -610,7 +600,7 @@
         </div>
     </div>
 
-    <!-- Custom Confirmation Modal (Replaces browser confirm) -->
+    <!-- Custom Confirmation Modal -->
     <div id="modal-confirm" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="theme-card rounded-3xl max-w-sm w-full p-6 shadow-2xl border theme-border text-center space-y-4">
             <div class="w-12 h-12 rounded-full bg-rose-500/10 text-rose-500 flex items-center justify-center mx-auto text-xl">
@@ -711,12 +701,12 @@
                 btn_sign_in: "Sign In",
                 btn_sign_out: "Sign Out",
                 auth_modal_title: "Cloud Account & Sync",
-                auth_desc: "Sign in to save your birthdays, custom categories, and celebration logs safely to the cloud so you can access them anywhere.",
+                auth_desc: "Sign in to save your birthdays, custom categories, and celebration logs safely to the cloud so you can access them anywhere on multiple devices.",
                 auth_status_label: "Current Status",
-                auth_status_signed_in: "Google Account Connected",
-                auth_status_guest: "Signed in as Guest",
+                auth_status_signed_in: "Signed In & Cloud Connected",
+                auth_status_guest: "Signed in as Guest (Cloud Saved)",
                 auth_status_offline: "Offline / Local Mode",
-                btn_google_signin: "Sign in with Google",
+                btn_sign_in_google: "Sign In with Google",
                 btn_sign_in_guest: "Continue as Guest",
                 btn_sync_now: "Sync Cloud Progress Now",
                 synced: "Saved to Cloud",
@@ -807,12 +797,12 @@
                 btn_sign_in: "登入帳號",
                 btn_sign_out: "登出帳號",
                 auth_modal_title: "雲端帳號與備份同步",
-                auth_desc: "登入帳號以自動將您的生日提醒、自訂標籤及回憶日誌備份至雲端，確保進度不丟失。",
+                auth_desc: "登入帳號以自動將您的生日提醒、自訂標籤及回憶日誌備份至雲端，確保在不同裝置上同步。",
                 auth_status_label: "目前狀態",
-                auth_status_signed_in: "已連結 Google 帳號",
-                auth_status_guest: "以訪客身份登入",
+                auth_status_signed_in: "已登入並連線雲端",
+                auth_status_guest: "以訪客身份登入 (已同步雲端)",
                 auth_status_offline: "離線 / 本地儲存",
-                btn_google_signin: "使用 Google 帳號登入",
+                btn_sign_in_google: "使用 Google 帳號登入",
                 btn_sign_in_guest: "以訪客身份繼續",
                 btn_sync_now: "立即同步雲端資料",
                 synced: "已儲存至雲端",
@@ -903,12 +893,12 @@
                 btn_sign_in: "登录账号",
                 btn_sign_out: "登出账号",
                 auth_modal_title: "云端账号与备份同步",
-                auth_desc: "登录账号以自动将您的生日提醒、自定义标签及回忆日志备份至云端，确保进度不丢失。",
+                auth_desc: "登录账号以自动将您的生日提醒、自定义标签及回忆日志备份至云端，确保在不同设备上同步。",
                 auth_status_label: "当前状态",
-                auth_status_signed_in: "已连接 Google 账号",
-                auth_status_guest: "以访客身份登录",
+                auth_status_signed_in: "已登录并连接云端",
+                auth_status_guest: "以访客身份登录 (已同步云端)",
                 auth_status_offline: "离线 / 本地存储",
-                btn_google_signin: "使用 Google 账号登录",
+                btn_sign_in_google: "使用 Google 账号登录",
                 btn_sign_in_guest: "以访客身份继续",
                 btn_sync_now: "立即同步云端数据",
                 synced: "已保存至云端",
@@ -927,6 +917,7 @@
             { id: 'cat-work', name: 'Work', color: 'nordic' }
         ];
 
+        // Application State
         window.currentLang = localStorage.getItem('bday_lang') || 'en';
         window.currentTheme = localStorage.getItem('bday_theme') || 'cafe';
         window.categories = JSON.parse(localStorage.getItem('bday_categories')) || defaultCategories;
@@ -1304,7 +1295,6 @@
             const pills = document.getElementById('category-filter-pills');
             if (!grid) return;
 
-            // Render filter pills
             if (pills) {
                 pills.innerHTML = `
                     <button onclick="setCategoryFilter('all')" class="px-3 py-1.5 rounded-xl text-xs font-bold transition ${window.activeCategoryFilter === 'all' ? 'theme-hero text-white shadow-sm' : 'theme-subcard border theme-border theme-text-muted'}">
@@ -1705,202 +1695,219 @@
         };
     </script>
 
+    <!-- Firebase Script Module for Real-time Cloud Sign In & Sync -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { 
             getAuth, 
             signInAnonymously, 
             signInWithCustomToken, 
-            signInWithPopup, 
             GoogleAuthProvider, 
+            signInWithPopup, 
             onAuthStateChanged, 
             signOut 
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { 
             getFirestore, 
             doc, 
+            getDoc, 
             setDoc, 
             onSnapshot 
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'bday-tracker-app';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-            apiKey: "demo-key",
-            authDomain: "demo-app.firebaseapp.com",
-            projectId: "demo-app",
-            storageBucket: "demo-app.appspot.com",
-            messagingSenderId: "123456789",
-            appId: "1:123456789:web:123456789"
-        };
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'bday-pulse-app';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' 
+            ? JSON.parse(__firebase_config) 
+            : {
+                apiKey: "AIzaSyDummyKeyForFallbackOnly",
+                authDomain: "bday-pulse.firebaseapp.com",
+                projectId: "bday-pulse",
+                storageBucket: "bday-pulse.appspot.com",
+                messagingSenderId: "123456789",
+                appId: "1:123456789:web:123456789"
+            };
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+        const googleProvider = new GoogleAuthProvider();
 
-        let currentUnsubscribe = null;
+        let currentUser = null;
+        let unsubscribeDoc = null;
 
-        window.performGoogleSignIn = async function() {
+        window.initAuth = async function() {
+            const initialToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
             try {
-                const provider = new GoogleAuthProvider();
-                await signInWithPopup(auth, provider);
-                showToast(t('auth_signed_in_toast'), "success");
-                closeAuthModal();
-            } catch (err) {
-                console.error("Google Sign-In Error:", err);
-                showToast("Google Sign-In failed: " + err.message, "error");
-            }
-        };
-
-        window.performSignInGuest = async function() {
-            try {
-                if (!auth.currentUser) {
-                    await signInAnonymously(auth);
+                if (initialToken) {
+                    await signInWithCustomToken(auth, initialToken);
                 }
-                showToast(t('auth_signed_in_toast'), "success");
-                closeAuthModal();
             } catch (err) {
-                console.error("Guest Sign-In Error:", err);
-                showToast("Sign in failed: " + err.message, "error");
+                console.warn("Auth initialization notice:", err);
             }
         };
 
-        window.performSignOut = async function() {
-            try {
-                await signOut(auth);
-                showToast(t('auth_signed_out_toast'), "info");
-                // Fallback to guest sign in after signing out
-                await signInAnonymously(auth);
-            } catch (err) {
-                console.error("Sign Out Error:", err);
-                showToast("Sign out failed: " + err.message, "error");
-            }
-        };
-
-        window.saveStateToCloud = async function() {
-            const user = auth.currentUser;
-            if (!user) return;
-            updateSyncIndicator('syncing');
-            try {
-                const userDocRef = doc(db, 'artifacts', appId, 'users', user.uid, 'userData', 'main');
-                await setDoc(userDocRef, {
-                    categories: window.categories,
-                    birthdays: window.birthdays,
-                    logs: window.logs,
-                    theme: window.currentTheme,
-                    lang: window.currentLang,
-                    updatedAt: new Date().toISOString()
-                }, { merge: true });
-                updateSyncIndicator('synced');
-            } catch (err) {
-                console.error("Cloud Save Error:", err);
-                updateSyncIndicator('error');
-            }
-        };
-
-        function updateSyncIndicator(status) {
-            const el = document.getElementById('sync-indicator');
-            if (!el) return;
-            if (status === 'synced') {
-                el.className = "inline-flex items-center text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200";
-                el.innerHTML = `<i class="fa-solid fa-cloud-check mr-1"></i> <span>${t('synced')}</span>`;
-            } else if (status === 'syncing') {
-                el.className = "inline-flex items-center text-[11px] font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200";
-                el.innerHTML = `<i class="fa-solid fa-arrows-rotate spin mr-1"></i> <span>${t('syncing')}</span>`;
-            } else if (status === 'error') {
-                el.className = "inline-flex items-center text-[11px] font-semibold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-200";
-                el.innerHTML = `<i class="fa-solid fa-cloud-xmark mr-1"></i> <span>${t('sync_error')}</span>`;
-            } else {
-                el.className = "inline-flex items-center text-[11px] font-semibold text-gray-500 bg-gray-100 px-2 py-0.5 rounded-md border border-gray-200";
-                el.innerHTML = `<i class="fa-solid fa-cloud mr-1"></i> <span>${t('local_only')}</span>`;
-            }
-        }
-
+        // Automatic authentication listener
         onAuthStateChanged(auth, (user) => {
-            const badgeEl = document.getElementById('modal-user-badge');
-            const idEl = document.getElementById('modal-user-id');
-            const statusText = document.getElementById('auth-status-text');
-            const statusDot = document.getElementById('auth-status-dot');
-            const btnSignout = document.getElementById('btn-signout');
-
+            currentUser = user;
+            window.currentUser = user;
+            updateAuthUI(user);
             if (user) {
-                if (statusDot) statusDot.className = "w-2 h-2 rounded-full bg-emerald-500";
-                if (btnSignout) btnSignout.classList.remove('hidden');
-
-                if (user.isAnonymous) {
-                    if (badgeEl) {
-                        badgeEl.innerText = t('auth_status_guest');
-                        badgeEl.className = "px-2.5 py-1 text-[11px] font-bold rounded-full bg-amber-500/10 text-amber-600 border border-amber-500/20";
-                    }
-                    if (idEl) idEl.innerText = `Guest UID: ${user.uid.substring(0, 12)}...`;
-                    if (statusText) statusText.innerText = "Guest Mode";
-                } else {
-                    const displayName = user.displayName || user.email || user.uid;
-                    if (badgeEl) {
-                        badgeEl.innerText = t('auth_status_signed_in');
-                        badgeEl.className = "px-2.5 py-1 text-[11px] font-bold rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-500/20";
-                    }
-                    if (idEl) idEl.innerText = `${displayName}`;
-                    if (statusText) statusText.innerText = displayName.split(' ')[0] || "Signed In";
-                }
-
-                // Subscribe to real-time data sync for this authenticated user
-                if (currentUnsubscribe) currentUnsubscribe();
-                const userDocRef = doc(db, 'artifacts', appId, 'users', user.uid, 'userData', 'main');
-                currentUnsubscribe = onSnapshot(userDocRef, (docSnap) => {
-                    if (docSnap.exists()) {
-                        const data = docSnap.data();
-                        if (data.categories) window.categories = data.categories;
-                        if (data.birthdays) window.birthdays = data.birthdays;
-                        if (data.logs) window.logs = data.logs;
-                        if (data.theme) {
-                            window.currentTheme = data.theme;
-                            changeTheme(data.theme, false);
-                        }
-                        if (data.lang) {
-                            window.currentLang = data.lang;
-                            changeLanguage(data.lang, false);
-                        }
-                        window.saveLocalOnly();
-                        renderAll();
-                        updateSyncIndicator('synced');
-                    } else {
-                        // Upload current local state to cloud for new accounts
-                        window.saveStateToCloud();
-                    }
-                }, (err) => {
-                    console.error("Firestore Listener Error:", err);
-                    updateSyncIndicator('error');
-                });
-
+                listenToUserData(user);
             } else {
-                if (statusDot) statusDot.className = "w-2 h-2 rounded-full bg-amber-500";
-                if (badgeEl) {
-                    badgeEl.innerText = t('auth_status_offline');
-                    badgeEl.className = "px-2.5 py-1 text-[11px] font-bold rounded-full bg-gray-500/10 text-gray-600 border border-gray-500/20";
-                }
-                if (idEl) idEl.innerText = "Not authenticated";
-                if (statusText) statusText.innerText = t('btn_sign_in');
-                if (btnSignout) btnSignout.classList.add('hidden');
-                updateSyncIndicator('local');
+                if (unsubscribeDoc) unsubscribeDoc();
+                updateSyncStatusUI('offline');
             }
         });
 
-        async function initAuth() {
+        // Real-time synchronization across devices
+        function listenToUserData(user) {
+            if (!user) return;
+            const userDocRef = doc(db, 'artifacts', appId, 'users', user.uid, 'userData', 'main');
+            if (unsubscribeDoc) unsubscribeDoc();
+
+            updateSyncStatusUI('syncing');
+            unsubscribeDoc = onSnapshot(userDocRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    if (Array.isArray(data.birthdays)) window.birthdays = data.birthdays;
+                    if (Array.isArray(data.categories)) window.categories = data.categories;
+                    if (Array.isArray(data.logs)) window.logs = data.logs;
+                    if (data.currentTheme) window.changeTheme(data.currentTheme, false);
+                    if (data.currentLang) window.changeLanguage(data.currentLang, false);
+                    window.saveLocalOnly();
+                    window.renderAll();
+                    updateSyncStatusUI('synced');
+                } else {
+                    window.saveStateToCloud();
+                }
+            }, (err) => {
+                console.error("Firestore sync error:", err);
+                updateSyncStatusUI('error');
+            });
+        }
+
+        // Save application data to cloud
+        window.saveStateToCloud = async function() {
+            if (!currentUser) return;
             try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else if (!auth.currentUser) {
-                    await signInAnonymously(auth);
-                }
+                updateSyncStatusUI('syncing');
+                const userDocRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'userData', 'main');
+                await setDoc(userDocRef, {
+                    birthdays: window.birthdays || [],
+                    categories: window.categories || [],
+                    logs: window.logs || [],
+                    currentTheme: window.currentTheme || 'cafe',
+                    currentLang: window.currentLang || 'en',
+                    updatedAt: new Date().toISOString()
+                }, { merge: true });
+                updateSyncStatusUI('synced');
             } catch (err) {
-                console.warn("Initial Auth fallback to Anonymous:", err);
-                if (!auth.currentUser) {
-                    await signInAnonymously(auth);
-                }
+                console.error("Cloud save failed:", err);
+                updateSyncStatusUI('error');
+            }
+        };
+
+        // Google Sign-In Function
+        window.performSignInGoogle = async function() {
+            try {
+                updateSyncStatusUI('syncing');
+                await signInWithPopup(auth, googleProvider);
+                window.showToast(window.t('auth_signed_in_toast'), 'success');
+                window.closeAuthModal();
+            } catch (err) {
+                console.error("Google sign in error:", err);
+                window.showToast("Google Sign-In failed: " + err.message, 'error');
+                updateSyncStatusUI('offline');
+            }
+        };
+
+        // Guest Sign-In Function
+        window.performSignInGuest = async function() {
+            try {
+                updateSyncStatusUI('syncing');
+                await signInAnonymously(auth);
+                window.showToast(window.t('auth_signed_in_toast'), 'success');
+                window.closeAuthModal();
+            } catch (err) {
+                window.showToast("Sign in failed: " + err.message, 'error');
+            }
+        };
+
+        // Sign Out Function
+        window.performSignOut = async function() {
+            try {
+                await signOut(auth);
+                window.showToast(window.t('auth_signed_out_toast'), 'info');
+                window.closeAuthModal();
+            } catch (err) {
+                window.showToast("Sign out failed: " + err.message, 'error');
+            }
+        };
+
+        // Update UI sync indicators
+        function updateSyncStatusUI(status) {
+            const indicator = document.getElementById('sync-indicator');
+            if (!indicator) return;
+
+            if (status === 'synced') {
+                indicator.className = "inline-flex items-center text-[11px] font-semibold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-md border border-emerald-200";
+                indicator.innerHTML = `<i class="fa-solid fa-cloud-check mr-1"></i> ${window.t('synced')}`;
+            } else if (status === 'syncing') {
+                indicator.className = "inline-flex items-center text-[11px] font-semibold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-md border border-amber-200";
+                indicator.innerHTML = `<i class="fa-solid fa-arrows-rotate fa-spin mr-1"></i> ${window.t('syncing')}`;
+            } else if (status === 'error') {
+                indicator.className = "inline-flex items-center text-[11px] font-semibold text-rose-700 bg-rose-100 px-2 py-0.5 rounded-md border border-rose-200";
+                indicator.innerHTML = `<i class="fa-solid fa-cloud-exclamation mr-1"></i> ${window.t('sync_error')}`;
+            } else {
+                indicator.className = "inline-flex items-center text-[11px] font-semibold text-gray-500 bg-gray-100 px-2 py-0.5 rounded-md border border-gray-200";
+                indicator.innerHTML = `<i class="fa-solid fa-cloud mr-1"></i> ${window.t('local_only')}`;
             }
         }
 
-        initAuth();
+        // Update UI user status modal elements
+        function updateAuthUI(user) {
+            const statusBtnText = document.getElementById('auth-status-text');
+            const statusDot = document.getElementById('auth-status-dot');
+            const modalUserEmail = document.getElementById('modal-user-id');
+            const modalBadge = document.getElementById('modal-user-badge');
+            const signOutBtn = document.getElementById('btn-signout');
+            const signInGoogleBtn = document.getElementById('btn-signin-google');
+            const signInGuestBtn = document.getElementById('btn-signin');
+
+            if (user) {
+                const isAnon = user.isAnonymous;
+                const displayId = user.email || (user.displayName ? `${user.displayName}` : (isAnon ? `Guest (${user.uid.substring(0, 6)}...)` : user.uid.substring(0, 8)));
+                
+                if (statusBtnText) statusBtnText.innerText = displayId.split(' ')[0] || 'Account';
+                if (statusDot) {
+                    statusDot.className = "w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
+                }
+                if (modalUserEmail) modalUserEmail.innerText = user.email || (user.displayName ? `${user.displayName} (${user.uid})` : user.uid);
+                if (modalBadge) {
+                    modalBadge.innerText = isAnon ? window.t('auth_status_guest') : window.t('auth_status_signed_in');
+                    modalBadge.className = "px-2.5 py-1 text-[11px] font-bold rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-500/20";
+                }
+                if (signOutBtn) signOutBtn.classList.remove('hidden');
+                if (signInGoogleBtn) signInGoogleBtn.classList.add('hidden');
+                if (signInGuestBtn) signInGuestBtn.classList.add('hidden');
+            } else {
+                if (statusBtnText) statusBtnText.innerText = window.t('btn_sign_in');
+                if (statusDot) {
+                    statusDot.className = "w-2 h-2 rounded-full bg-amber-500";
+                }
+                if (modalUserEmail) modalUserEmail.innerText = window.t('auth_status_offline');
+                if (modalBadge) {
+                    modalBadge.innerText = window.t('auth_status_offline');
+                    modalBadge.className = "px-2.5 py-1 text-[11px] font-bold rounded-full bg-amber-500/10 text-amber-600 border border-amber-500/20";
+                }
+                if (signOutBtn) signOutBtn.classList.add('hidden');
+                if (signInGoogleBtn) signInGoogleBtn.classList.remove('hidden');
+                if (signInGuestBtn) signInGuestBtn.classList.remove('hidden');
+            }
+        }
+
+        // Initialize auth flow
+        window.initAuth();
     </script>
 </body>
 </html>
