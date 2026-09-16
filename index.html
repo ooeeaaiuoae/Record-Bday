@@ -1864,10 +1864,127 @@
 
         // Initialize authentication
         window.initAuth();
-
     </script>
-    
+
+    <!--Google Auth & Firebase Sync -->
+<!-- Google Auth & Firebase Sync Integration -->
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+      import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+      import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyAkSh_5pb0VO1gluZzNuZ8Wv0okvk4P8eo",
+        authDomain: "bday-tracker-67974.firebaseapp.com",
+        projectId: "bday-tracker-67974",
+        storageBucket: "bday-tracker-67974.firebasestorage.app",
+        messagingSenderId: "636532167897",
+        appId: "1:636532167897:web:04ddc9003b1f55679d1ac8",
+        measurementId: "G-H6TP12SS4X"
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
+      const provider = new GoogleAuthProvider();
+
+      let currentUser = null;
+
+      // Google Sign-In (Overrides guest sign-in for full Google Auth)
+      window.performSignInGuest = async function() {
+        try {
+          updateSyncStatusUI('syncing');
+          const result = await signInWithPopup(auth, provider);
+          currentUser = result.user;
+          if (typeof window.showToast === 'function') {
+            window.showToast("Logged in as " + currentUser.displayName, 'success');
+          }
+          if (typeof window.closeAuthModal === 'function') {
+            window.closeAuthModal();
+          }
+        } catch (err) {
+          console.error("Login failed:", err);
+          updateSyncStatusUI('error');
+          if (typeof window.showToast === 'function') {
+            window.showToast("Sign in failed: " + err.message, 'error');
+          }
+        }
+      };
+
+      // Sign Out
+      window.performSignOut = async function() {
+        try {
+          await signOut(auth);
+          if (typeof window.showToast === 'function') {
+            window.showToast("Signed out successfully", 'info');
+          }
+          if (typeof window.closeAuthModal === 'function') {
+            window.closeAuthModal();
+          }
+        } catch (err) {
+          console.error("Sign out failed:", err);
+        }
+      };
+
+      // Save App State to Cloud
+      window.saveStateToCloud = async function() {
+        if (!currentUser) return;
+        try {
+          updateSyncStatusUI('syncing');
+          const userDocRef = doc(db, 'users', currentUser.uid);
+          await setDoc(userDocRef, {
+            birthdays: window.birthdays || [],
+            categories: window.categories || [],
+            logs: window.logs || [],
+            currentTheme: window.currentTheme || 'cafe',
+            currentLang: window.currentLang || 'en',
+            updatedAt: new Date().toISOString()
+          }, { merge: true });
+          updateSyncStatusUI('synced');
+        } catch (err) {
+          console.error("Cloud save failed:", err);
+          updateSyncStatusUI('error');
+        }
+      };
+
+      // Listen for Auth Changes & Load Data Automatically
+      onAuthStateChanged(auth, async (user) => {
+        currentUser = user;
+        window.currentUser = user;
+        if (typeof updateAuthUI === 'function') {
+          updateAuthUI(user);
+        }
+
+        if (user) {
+          updateSyncStatusUI('syncing');
+          try {
+            const docSnap = await getDoc(doc(db, "users", user.uid));
+            if (docSnap.exists()) {
+              const data = docSnap.data();
+              if (Array.isArray(data.birthdays)) window.birthdays = data.birthdays;
+              if (Array.isArray(data.categories)) window.categories = data.categories;
+              if (Array.isArray(data.logs)) window.logs = data.logs;
+              if (data.currentTheme && typeof window.changeTheme === 'function') {
+                window.changeTheme(data.currentTheme, false);
+              }
+              if (data.currentLang && typeof window.changeLanguage === 'function') {
+                window.changeLanguage(data.currentLang, false);
+              }
+              if (typeof window.saveLocalOnly === 'function') window.saveLocalOnly();
+              if (typeof window.renderAll === 'function') window.renderAll();
+              updateSyncStatusUI('synced');
+            } else {
+              // First time user: push initial local data to cloud
+              window.saveStateToCloud();
+            }
+          } catch (err) {
+            console.error("Error loading user data:", err);
+            updateSyncStatusUI('error');
+          }
+        } else {
+          updateSyncStatusUI('offline');
+        }
+      });
+    </script>
 </body>
 </html>
-
-
